@@ -1,4 +1,11 @@
-# Hosting — Cloudflare Pages (free)
+# Hosting — Cloudflare Workers (free)
+
+> The project is a **Cloudflare Worker with static assets** (Cloudflare's current
+> recommendation; it replaced Pages for new projects). `wrangler.jsonc` configures it,
+> `src/worker.js` handles `/api/*` and serves every other path from the repo's files.
+> `.assetsignore` keeps source/docs out of the public site. Settings below that mention
+> "Pages" apply the same way under **Workers & Pages → keiross → Settings**.
+
 
 The site is a static site plus one serverless function (`functions/api/lead.js`, the
 enquiry form). Cloudflare Pages hosts both for free, allows commercial use, and
@@ -31,6 +38,9 @@ preview link (e.g. `https://<branch>.keiross.pages.dev`).
    | `LEADS_SHEET_SECRET` | the same secret as in the Apps Script | **Secret** |
    | `CALLMEBOT` *(optional)* | `919110131716:APIKEY` for WhatsApp alerts | Secret |
 
+   On a Worker: **keiross → Settings → Variables and Secrets → + Add**. Use type **Secret** for all
+   of them (`keep_vars` in wrangler.jsonc also preserves plain-text ones across deploys).
+
 4. **Save and Deploy.** After ~1 minute the site is live at `https://keiross.pages.dev`.
    If you added variables *after* the first deploy: **Deployments → ⋯ → Retry deployment**.
 
@@ -57,7 +67,7 @@ preview link (e.g. `https://<branch>.keiross.pages.dev`).
   `about.html` for `/about` and redirects any old `.html` link to the clean URL.
 * `_headers` sets caching and basic security headers (Cloudflare only).
 * `404.html` is served automatically for unknown URLs.
-* Logs for the lead function: project → **Deployments → latest → Functions → Real-time logs**
+* Logs for the lead function: **Workers & Pages → keiross → Observability** (or Logs)
   (look for `lead delivery failed`).
 * Free-plan limits: unlimited bandwidth and requests for pages; 100,000 function calls/day;
   500 builds/month — far above this site's needs.

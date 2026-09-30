@@ -1,0 +1,15 @@
+# Files in the repo that must NOT be published as website files
+.git
+.github
+.assetsignore
+.gitignore
+wrangler.jsonc
+wrangler.toml
+vercel.json
+node_modules
+src
+functions
+api
+tools
+docs
+*.md
