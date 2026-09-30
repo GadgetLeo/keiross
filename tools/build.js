@@ -47,8 +47,8 @@ function header(r = "../"){
       ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<a href="../products/#${k}">${esc(AREAS[k].label)}</a>`).join("")}
     </div></div>
     <a href="../index.html#serve">Distributors</a>
-    <a href="../index.html#contact">Contact Us</a>
-    <a class="btn" href="../index.html#contact">Enquire Now</a>
+    <a href="../contact.html">Contact Us</a>
+    <a class="btn" href="../contact.html">Enquire Now</a>
   </nav>
 </div></header>`, r);
 }
@@ -62,7 +62,7 @@ function footer(r = "../"){
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
     <div><h4>Therapy Areas</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/#${k}">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
-    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../index.html#serve">Distributors</a></li><li><a href="../index.html#contact">Contact Us</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../index.html#serve">Distributors</a></li><li><a href="../contact.html">Contact Us</a></li></ul></div>
     <div><h4>Registered Office</h4>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
       <p><span data-cfg="phone"></span></p><p><span data-cfg="email"></span></p>
@@ -116,7 +116,7 @@ function page(p){
       </section>` : "";
   const variants = p.variants.length ? `
       <section class="psec"><h2>Also available</h2><div class="vgrid">
-        ${p.variants.map(v=>`<div class="vcard"><b>${esc(v.brand)}</b><span class="fb">${esc(FORM_PL[v.form]||v.form)}</span><p>${esc(v.composition)}</p><button class="btn line-dark sm" data-enq-variant="${esc(v.brand)}|${esc(v.composition)}">Enquire</button></div>`).join("")}
+        ${p.variants.map(v=>`<div class="vcard"><b>${esc(v.brand)}</b><span class="fb">${esc(FORM_PL[v.form]||v.form)}</span><p>${esc(v.composition)}</p><a class="btn line-dark sm" href="../contact.html?product=${encodeURIComponent(v.brand)}">Enquire</a></div>`).join("")}
       </div></section>` : "";
 
   return `<!DOCTYPE html>
@@ -159,7 +159,7 @@ ${header()}
       <p class="tag">“${esc(p.tagline)}”</p>
       <div class="acts">
         <button class="btn" data-enq data-via="wa">${I.wa} WhatsApp Enquiry</button>
-        <button class="btn blue" data-enq data-via="mail">Email Enquiry</button>
+        <a class="btn blue" href="../contact.html?product=${encodeURIComponent(p.brand)}">Send Enquiry</a>
       </div>
       <small class="fine">${p.type==="rx"?"Prescription medicine — supplied to licensed trade buyers and for use under medical supervision only.":"Supplied to the trade. Read the label before use."}</small>
     </div>
@@ -187,7 +187,7 @@ ${header()}
           <tr><td>Pack size</td><td>On enquiry</td></tr>
           <tr><td>Marketed by</td><td>Keiross Lifescience Pvt. Ltd., Ahmedabad</td></tr>
         </table>
-        <button class="btn full" data-enq data-via="wa">Request trade price</button>
+        <a class="btn full" href="../contact.html?product=${encodeURIComponent(p.brand)}">Request trade price</a>
       </div>
     </aside>
   </div>
@@ -208,7 +208,7 @@ document.addEventListener("click", e => {
   let item = P;
   if (v){ const [brand, composition] = v.dataset.enqVariant.split("|"); item = { brand, composition }; }
   const m = enquiryText(item);
-  if (!send(m.text, m.subject, b ? b.dataset.via : "wa")) location.href = "../index.html?product=" + encodeURIComponent(m.t) + "#contact";
+  if (!send(m.text, m.subject, b ? b.dataset.via : "wa")) location.href = "../contact.html?product=" + encodeURIComponent(item.brand);
 });
 </script>
 </body>
@@ -349,7 +349,7 @@ ${header("")}
     <div class="wrap">
       <h2>Looking to partner with a growing pharmaceutical brand?</h2>
       <p>Distributors, stockists and institutional buyers are welcome to send us an enquiry.</p>
-      <a class="btn" href="index.html#contact">Contact Us</a>
+      <a class="btn" href="contact.html">Contact Us</a>
     </div>
   </section>
 </main>
@@ -430,7 +430,7 @@ ${header()}
 
   <div class="wrap hub">
     ${areas.map(section).join("")}
-    <div class="empty" id="hempty" hidden>No products match your search. <a href="../index.html#contact" style="color:var(--teal);font-weight:600">Ask us directly →</a></div>
+    <div class="empty" id="hempty" hidden>No products match your search. <a href="../contact.html" style="color:var(--teal);font-weight:600">Ask us directly →</a></div>
     <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
   </div>
 
@@ -438,7 +438,7 @@ ${header()}
     <div class="wrap">
       <h2>Need a product or a price list?</h2>
       <p>Send us your requirement and our team will share availability, pack sizes and trade terms.</p>
-      <a class="btn" href="../index.html#contact">Send an Enquiry</a>
+      <a class="btn" href="../contact.html">Send an Enquiry</a>
     </div>
   </section>
 </main>
@@ -466,15 +466,138 @@ $("#hq").addEventListener("input", e => {
 }
 fs.writeFileSync(path.join(ROOT, "products", "index.html"), productsHub());
 
+/* ---------------- contact.html ---------------- */
+function contactPage(){
+  const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
+  const buyers = ["Distributor", "Stockist", "Pharmacy / Medical store", "Hospital", "Clinic", "Healthcare professional", "Other"];
+  const addr = "304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India";
+  const mapQ = encodeURIComponent("Merlin Sparsh, Koyli Talav, Narol, Ahmedabad 382405");
+  const ic = {
+    phone: I.phone.replace('stroke-width="2"', 'stroke-width="1.8"'),
+    wa: I.wa,
+    mail: I.mail.replace('stroke-width="2"', 'stroke-width="1.8"'),
+    pin: I.pin.replace('stroke-width="2"', 'stroke-width="1.8"'),
+  };
+  const ld = {
+    "@context":"https://schema.org",
+    "@type":"ContactPage",
+    "url": `${BASE}/contact.html`,
+    "name": "Contact Keiross Lifescience",
+    "mainEntity": {
+      "@type":"Organization", "name":"Keiross Lifescience Private Limited", "url": BASE + "/",
+      "email": SITE.email || undefined, "telephone": SITE.phone || undefined,
+      "address": { "@type":"PostalAddress", "streetAddress":"304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol", "addressLocality":"Daskroi, Ahmedabad", "addressRegion":"Gujarat", "postalCode":"382405", "addressCountry":"IN" },
+      "contactPoint": [{ "@type":"ContactPoint", "contactType":"sales", "telephone": SITE.phone || undefined, "email": SITE.email || undefined, "areaServed":"IN", "availableLanguage":["English","Hindi","Gujarati"] }]
+    }
+  };
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact Us | Distributor & Trade Enquiries | Keiross Lifescience</title>
+<meta name="description" content="Contact Keiross Lifescience for distributorship, stockist, pharmacy and hospital enquiries, product availability and trade terms. Call or WhatsApp ${esc(SITE.phone || "")} or send an enquiry online.">
+<link rel="canonical" href="${BASE}/contact.html">
+<meta property="og:title" content="Contact Keiross Lifescience">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${BASE}/contact.html">
+<meta property="og:image" content="${BASE}/images/products/cover.jpg">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="images/brand/favicon.png">
+<link rel="apple-touch-icon" href="images/brand/logo-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<script type="application/ld+json">${JSON.stringify(ld)}</script>
+</head>
+<body>
+${header("")}
+<main>
+  <section class="pagehero">
+    <div class="wrap">
+      <div class="crumb"><a href="index.html">Home</a><span>/</span>Contact Us</div>
+      <h1>Let's <span>work together</span></h1>
+      <p>Distributorship, stockist and institutional enquiries, product availability, price lists and trade terms — send us your requirement and our team will get back to you within one business day.</p>
+    </div>
+  </section>
+
+  <div class="quick"><div class="wrap">
+    <a class="qc" href="tel:${esc((SITE.phone||"").replace(/\s/g,""))}"><span class="ic">${ic.phone}</span><span><small>Call us</small><b>${esc(SITE.phone || "Phone")}</b></span></a>
+    <a class="qc wa" href="https://wa.me/${esc((SITE.whatsapp||"").replace(/\D/g,""))}?text=${encodeURIComponent("Hello Keiross Lifescience, I have a business enquiry.")}" target="_blank" rel="noopener"><span class="ic">${ic.wa}</span><span><small>WhatsApp</small><b>Chat with us</b></span></a>
+    <a class="qc em" href="mailto:${esc(SITE.email||"")}"><span class="ic">${ic.mail}</span><span><small>Email</small><b>${esc(SITE.email || "Email")}</b></span></a>
+  </div></div>
+
+  <section class="sec">
+    <div class="wrap contact2">
+      <div>
+        <form class="enq lead" data-lead novalidate>
+          <h2>Send an enquiry</h2>
+          <p class="sub">Fields marked * are required. We use your details only to respond to this enquiry.</p>
+          <label class="fl">Full name *<input name="name" autocomplete="name" required maxlength="80"></label>
+          <label class="fl">Phone / WhatsApp *<input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" placeholder="10-digit mobile number"></label>
+          <label class="fl">Firm / organisation<input name="firm" autocomplete="organization" maxlength="120"></label>
+          <label class="fl">Email<input name="email" type="email" autocomplete="email" maxlength="120"></label>
+          <label class="fl">You are a *
+            <select name="buyer">${buyers.map(b => `<option>${esc(b)}</option>`).join("")}</select>
+          </label>
+          <label class="fl">City &amp; state<input name="city" autocomplete="address-level2" maxlength="80" placeholder="e.g. Ranchi, Jharkhand"></label>
+          <details class="picker full">
+            <summary>Products of interest <span>(optional — tap to choose)</span></summary>
+            ${areas.map(k => `<fieldset><legend>${esc(AREAS[k].label)}</legend>${PRODUCTS.filter(p=>p.area===k).map(p => `<label class="pk"><input type="checkbox" name="pick" value="${esc(p.brand)}"><span>${esc(p.brand)}</span></label>`).join("")}</fieldset>`).join("")}
+          </details>
+          <label class="fl full">Other products / quantities<input name="products" maxlength="400" placeholder="e.g. 50 boxes Keifix-O, full range price list"></label>
+          <label class="fl full">Message<textarea name="msg" maxlength="2000" placeholder="Your requirement, delivery location, or any questions"></textarea></label>
+          <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+          <input type="hidden" name="t">
+          <label class="consent full"><input type="checkbox" name="consent"> <span>I agree to be contacted by Keiross Lifescience by phone, WhatsApp or email about this enquiry. *</span></label>
+          <div class="factions">
+            <button class="btn" type="submit">Send Enquiry</button>
+            <span data-status role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+
+      <aside class="cside">
+        <div class="next">
+          <h3>What happens next</h3>
+          <ol>
+            <li><b>We receive your enquiry</b><span>It goes straight to our sales team, with a reference number for you.</span></li>
+            <li><b>We call you back</b><span>Within one business day, on the number you share.</span></li>
+            <li><b>Price list &amp; terms</b><span>Availability, pack sizes and trade terms for your region.</span></li>
+          </ol>
+        </div>
+        <div class="office">
+          <h3>Registered office</h3>
+          <p>${esc(addr)}</p>
+          <p class="hrs"><b>Business hours:</b> <span data-cfg="hours"></span></p>
+          <div class="map"><iframe title="Keiross Lifescience office location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${mapQ}&z=15&output=embed"></iframe></div>
+          <a class="ml" href="https://www.google.com/maps/search/?api=1&query=${mapQ}" target="_blank" rel="noopener">Open in Google Maps →</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+${footer("")}
+<script src="data/site.js"></script>
+<script src="assets/common.js"></script>
+<script src="assets/lead.js"></script>
+</body>
+</html>
+`;
+}
+fs.writeFileSync(path.join(ROOT, "contact.html"), contactPage());
+
 const today = new Date().toISOString().slice(0,10);
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
 `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${BASE}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
   <url><loc>${BASE}/products/</loc><lastmod>${today}</lastmod><priority>0.9</priority></url>
+  <url><loc>${BASE}/contact.html</loc><lastmod>${today}</lastmod><priority>0.7</priority></url>
   <url><loc>${BASE}/about.html</loc><lastmod>${today}</lastmod><priority>0.7</priority></url>
 ${PRODUCTS.map(p => `  <url><loc>${BASE}/products/${p.slug}.html</loc><lastmod>${today}</lastmod><priority>0.8</priority></url>`).join("\n")}
 </urlset>
 `);
 fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`);
-console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about.html + sitemap.xml`);
+console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about.html + contact.html + sitemap.xml`);
