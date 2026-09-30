@@ -4,11 +4,13 @@
    Delivers each lead to every channel that is configured
    (Vercel → Project → Settings → Environment Variables):
 
-     RESEND_API_KEY        Email the lead (https://resend.com, free tier)
-     LEADS_TO              Where lead emails go. Default: keirosslifesciencepvtltd@gmail.com
-     LEADS_FROM            Sender. Default: Keiross Website <onboarding@resend.dev>
-     LEADS_SHEET_WEBHOOK   Google Apps Script web-app URL (logs a row per lead)
-     LEADS_SHEET_SECRET    Shared secret checked by the Apps Script
+     LEADS_SHEET_WEBHOOK   Google Apps Script web-app URL: logs a row to the
+     LEADS_SHEET_SECRET    "Keiross Leads" sheet AND emails the lead from Gmail
+                           (script: tools/leads-sheet.gs)
+     CALLMEBOT             WhatsApp alert via CallMeBot, as "phone:apikey"
+                           e.g. "919110131716:123456" (comma-separate for more people)
+     RESEND_API_KEY        Optional extra email channel (https://resend.com)
+     LEADS_TO / LEADS_FROM Recipient / sender for the Resend channel
 
    The request succeeds if at least one channel accepts the lead.
    If none is configured or all fail, it returns 503 and the page
@@ -66,6 +68,7 @@ async function sendEmail(lead, meta) {
   const text = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
+    signal: AbortSignal.timeout(8000),
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from, to, subject: `[Lead ${meta.id}] ${lead.buyer}: ${lead.name}${lead.city ? ", " + lead.city : ""}`,
@@ -83,11 +86,36 @@ async function logSheet(lead, meta) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ secret: process.env.LEADS_SHEET_SECRET || "", id: meta.id, received: meta.when, geo: meta.geo, ...lead }),
-    redirect: "follow"
+    redirect: "follow",
+    signal: AbortSignal.timeout(9000)
   });
   const body = await r.text();
   if (!r.ok || !/"ok"\s*:\s*true/.test(body)) throw new Error(`sheet ${r.status}: ${body.slice(0, 200)}`);
   return { ch: "sheet", ok: true };
+}
+
+async function whatsappAlert(lead, meta) {
+  const list = (process.env.CALLMEBOT || "").split(",").map(s => s.trim()).filter(Boolean);
+  if (!list.length) return { ch: "whatsapp", skipped: true };
+  const text = [
+    `New lead ${meta.id}`,
+    `${lead.name} (${lead.buyer})`,
+    [lead.firm, lead.city].filter(Boolean).join(", "),
+    `Phone: ${lead.phone}`,
+    lead.email && `Email: ${lead.email}`,
+    lead.products && `Products: ${lead.products.slice(0, 200)}`,
+    lead.msg && `Msg: ${lead.msg.slice(0, 300)}`
+  ].filter(Boolean).join("\n");
+  const results = await Promise.allSettled(list.map(async entry => {
+    const [phone, apikey] = entry.split(":").map(s => s.trim());
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent("+" + phone.replace(/\D/g, ""))}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apikey || "")}`;
+    const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const body = await r.text();
+    if (!r.ok || /error|invalid|not (active|allowed)/i.test(body)) throw new Error(`callmebot ${r.status}: ${body.replace(/<[^>]+>/g, " ").slice(0, 160)}`);
+  }));
+  const failed = results.filter(r => r.status === "rejected");
+  if (failed.length === results.length) throw failed[0].reason;
+  return { ch: "whatsapp", ok: true };
 }
 
 module.exports = async (req, res) => {
@@ -112,7 +140,7 @@ module.exports = async (req, res) => {
     geo: [h["x-vercel-ip-city"], h["x-vercel-ip-country-region"], h["x-vercel-ip-country"]].filter(Boolean).map(decodeURIComponent).join(", ")
   };
 
-  const results = await Promise.allSettled([sendEmail(L, meta), logSheet(L, meta)]);
+  const results = await Promise.allSettled([logSheet(L, meta), whatsappAlert(L, meta), sendEmail(L, meta)]);
   const delivered = results.filter(r => r.status === "fulfilled" && r.value.ok).map(r => r.value.ch);
   results.filter(r => r.status === "rejected").forEach(r => console.error("lead delivery failed:", meta.id, r.reason && r.reason.message));
 
