@@ -9,6 +9,11 @@
   "preview_urls": true,
   "keep_vars": true,
   "observability": { "enabled": true },
+  // Non-secret settings. LEADS_SHEET_SECRET (and optional CALLMEBOT) are set as
+  // Secrets in the Cloudflare dashboard: keiross -> Settings -> Variables and Secrets.
+  "vars": {
+    "LEADS_SHEET_WEBHOOK": "https://script.google.com/macros/s/AKfycbwvMHpDfE_1ksy4G_ip5r3QBRxSq_jM0HAhKLX2flqwrQ96Rk42YxVwVUHC-uictB3N9A/exec"
+  },
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
