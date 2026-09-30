@@ -18,7 +18,7 @@ const formLabel = p => p.formLabel || FORM_PL[p.form] || p.form;
 const TYPE = { rx:"Prescription medicine (℞)", ayurvedic:"Ayurvedic proprietary medicine", nutra:"Nutraceutical" };
 const containsLbl = p => ({ Tablet:"Each tablet contains", Capsule:"Each capsule contains", Softgel:"Each softgel capsule contains", Injection:"Each vial contains", Syrup:"Composition", Suspension:"Each 5 ml contains" }[p.form] || "Composition");
 
-const LOGO = `<img class="mk" src="../images/brand/logo-mark-88.png" alt="" width="44" height="44">`;
+const LOGO = `<img class="mk" src="../images/brand/logo-mark-88.webp" alt="" width="44" height="44">`;
 const I = {
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
@@ -122,7 +122,7 @@ ${o.noindex ? "" : `<link rel="canonical" href="${url}">\n`}${SITE.googleVerific
 <link rel="manifest" href="${r}site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-${o.preload ? `<link rel="preload" as="image" href="${r}${o.preload}" fetchpriority="high">\n` : ""}<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap">
+${(o.preload || []).map(([src, media]) => `<link rel="preload" as="image" href="${r}${src}" media="${media}" fetchpriority="high">\n`).join("")}<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="${r}assets/site.css">
@@ -770,7 +770,7 @@ const TILE_ICONS = {
   const head = pageHead({ r:"", path:"", title:"Keiross Lifescience Pvt. Ltd. | Pharmaceutical Company, Ahmedabad",
     ogTitle:"Keiross Lifescience — Caring for Healthy Life",
     desc:`Keiross Lifescience markets ${PRODUCTS.length} own-brand medicines and nutraceuticals across ${areas.length} categories to distributors, stockists, pharmacies, hospitals and clinics across India.`,
-    image:"images/products/cover.jpg", imageAlt:"Keiross Lifescience — Caring for Healthy Life", main:ORG_ID, preload:"images/hero1.jpg" });
+    image:"images/products/cover.jpg", imageAlt:"Keiross Lifescience — Caring for Healthy Life", main:ORG_ID, preload:[["images/hero1-m.jpg","(max-width:760px)"],["images/hero1.jpg","(min-width:761px)"]] });
   fs.writeFileSync(f, html.replace(/<!-- SEO:START[^>]*-->[\s\S]*?<!-- SEO:END -->/, m => m.slice(0, m.indexOf("-->") + 3) + "\n" + head + "\n<!-- SEO:END -->"));
 }
 

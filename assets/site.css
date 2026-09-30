@@ -566,3 +566,5 @@ a.tile{display:block}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pc .rxb{color:#ff8f73;border-color:#7a3a2c}}
 :root[data-theme="dark"] .pc .rxb{color:#ff8f73;border-color:#7a3a2c}
 footer .logo small{color:#2cc7b3}
+/* phones get a 500px-wide crop of the first hero (LCP image) */
+@media (max-width:760px){.slide.s1{background-image:url(../images/hero1-m.jpg)!important}}
