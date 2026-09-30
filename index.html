@@ -28,7 +28,10 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="images/hero1.jpg" fetchpriority="high">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="assets/site.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Corporation","@id":"https://keiross.vercel.app/#organization","name":"Keiross Lifescience","legalName":"Keiross Lifescience Private Limited","alternateName":["Keiross","Keiross Lifescience Pvt. Ltd."],"url":"https://keiross.vercel.app/","logo":{"@type":"ImageObject","url":"https://keiross.vercel.app/images/brand/logo-mark.png","width":194,"height":194},"image":{"@type":"ImageObject","url":"https://keiross.vercel.app/images/products/cover.jpg","width":1600,"height":905},"slogan":"Caring for Healthy Life","description":"Ahmedabad-based pharmaceutical company marketing own-brand prescription medicines, pharmaceutical formulations and nutraceuticals to distributors, stockists, pharmacies, hospitals and clinics across India.","foundingDate":"2026-02-18","foundingLocation":{"@type":"Place","name":"Ahmedabad, Gujarat, India"},"identifier":{"@type":"PropertyValue","propertyID":"CIN","value":"U46497GJ2026PTC173763"},"taxID":"20AAMCK6150E1ZV","email":"keirosslifesciencepvtltd@gmail.com","telephone":"+91 91101 31716","address":{"@type":"PostalAddress","streetAddress":"304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol","addressLocality":"Daskroi, Ahmedabad","addressRegion":"Gujarat","postalCode":"382405","addressCountry":"IN"},"contactPoint":[{"@type":"ContactPoint","contactType":"sales","telephone":"+91 91101 31716","email":"keirosslifesciencepvtltd@gmail.com","areaServed":"IN","availableLanguage":["English","Hindi","Gujarati"],"url":"https://keiross.vercel.app/contact"}],"areaServed":{"@type":"Country","name":"India"},"knowsAbout":["Anti-infectives","Respiratory & Allergy","Gastroenterology","Pain & Inflammation","Corticosteroids","Bone, Joint & Gout","Neurology","Nutrition & Wellness","Urology"],"member":[{"@type":"OrganizationRole","roleName":"Director","member":{"@type":"Person","@id":"https://keiross.vercel.app/about#rashmi-modi","name":"Rashmi Modi","jobTitle":"Director"}},{"@type":"OrganizationRole","roleName":"Director","member":{"@type":"Person","@id":"https://keiross.vercel.app/about#dipak-kumar-barnwal","name":"Dipak Kumar Barnwal","jobTitle":"Director"}}]},{"@type":"WebSite","@id":"https://keiross.vercel.app/#website","url":"https://keiross.vercel.app/","name":"Keiross Lifescience","alternateName":"Keiross","publisher":{"@id":"https://keiross.vercel.app/#organization"},"inLanguage":"en-IN"},{"@type":"WebPage","@id":"https://keiross.vercel.app/#webpage","url":"https://keiross.vercel.app/","name":"Keiross Lifescience Pvt. Ltd. | Pharmaceutical Company, Ahmedabad","description":"Keiross Lifescience markets 24 own-brand medicines and nutraceuticals across 9 categories to distributors, stockists, pharmacies, hospitals and clinics…","isPartOf":{"@id":"https://keiross.vercel.app/#website"},"inLanguage":"en-IN","primaryImageOfPage":{"@type":"ImageObject","url":"https://keiross.vercel.app/images/products/cover.jpg","width":1600,"height":905},"about":{"@id":"https://keiross.vercel.app/#organization"},"mainEntity":{"@id":"https://keiross.vercel.app/#organization"}}]}</script>
 <!-- SEO:END -->
@@ -42,7 +45,7 @@
   <div class="grp"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span data-cfg="phone"></span></span></div>
 </div></div>
 <header class="hdr"><div class="wrap">
-  <a class="logo" href="/" aria-label="Keiross Lifescience home"><img class="mk" src="images/brand/logo-mark.png" alt="" width="44" height="44"><span><b>KEIROSS</b><small>Lifescience</small></span></a>
+  <a class="logo" href="/"><img class="mk" src="images/brand/logo-mark-88.png" alt="" width="44" height="44"><span><b>KEIROSS</b><small>Lifescience</small></span></a>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <nav class="menu" id="menu">
     <a href="/">Home</a>
@@ -87,7 +90,7 @@
         <div class="cta anim"><a class="btn" href="products/">Explore Products</a><a class="btn line" href="contact">Contact Us</a></div>
       </div>
     </div>
-    <div class="slide" style="background-image:url(images/hero2.jpg)">
+    <div class="slide" data-bg="images/hero2.jpg">
       <div class="wrap">
         <div class="kick anim">Trade &amp; distribution</div>
         <h2 class="anim">Reliable supply for <span>distributors &amp; stockists</span></h2>
@@ -95,7 +98,7 @@
         <div class="cta anim"><a class="btn" href="contact?type=Distributor">Become a Distributor</a><a class="btn line" href="products/">View Range</a></div>
       </div>
     </div>
-    <div class="slide" style="background-image:url(images/hero3.jpg)">
+    <div class="slide" data-bg="images/hero3.jpg">
       <div class="wrap">
         <div class="kick anim">Healthcare partners</div>
         <h2 class="anim">Serving pharmacies, <span>hospitals &amp; clinics</span></h2>
@@ -120,7 +123,7 @@
   <section class="sec" id="about">
     <div class="wrap about">
       <div class="pic">
-        <img src="images/about.jpg" alt="Pharmaceutical quality laboratory" width="1000" height="1100">
+        <img src="images/about.webp" alt="Pharmaceutical quality laboratory" width="720" height="792" loading="lazy">
         <div class="badge"><b>2026</b><span>Incorporated in Ahmedabad, Gujarat</span></div>
       </div>
       <div>
@@ -189,7 +192,7 @@
       <!-- FEATURED:START (generated) -->
       <div class="pgrid feat">
         <article class="pc" style="--area:#e0572b">
-          <a class="art" href="products/keifix-o" aria-label="Keifix-O details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/keifix-o.jpg" alt="Keifix-O — Cefixime + Ofloxacin" width="640" height="414"></a>
+          <a class="art" href="products/keifix-o"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/keifix-o.jpg" alt="Keifix-O — Cefixime + Ofloxacin" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Anti-infectives</div>
             <h3><a href="products/keifix-o">Keifix-O</a></h3>
@@ -199,7 +202,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#e0572b">
-          <a class="art" href="products/lyzox-600" aria-label="Lyzox-600 details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/lyzox-600.jpg" alt="Lyzox-600 — Linezolid" width="640" height="414"></a>
+          <a class="art" href="products/lyzox-600"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/lyzox-600.jpg" alt="Lyzox-600 — Linezolid" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Anti-infectives</div>
             <h3><a href="products/lyzox-600">Lyzox-600</a></h3>
@@ -209,7 +212,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#1f8fd6">
-          <a class="art" href="products/orbimont-l" aria-label="Orbimont-L details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/orbimont-l.jpg" alt="Orbimont-L — Levocetirizine + Montelukast" width="640" height="414"></a>
+          <a class="art" href="products/orbimont-l"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/orbimont-l.jpg" alt="Orbimont-L — Levocetirizine + Montelukast" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Respiratory &amp; Allergy</div>
             <h3><a href="products/orbimont-l">Orbimont-L</a></h3>
@@ -219,7 +222,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#d99a0b">
-          <a class="art" href="products/enzorb-dsr" aria-label="Enzorb-DSR details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/enzorb-dsr.jpg" alt="Enzorb-DSR — Rabeprazole Sodium + Domperidone" width="640" height="414"></a>
+          <a class="art" href="products/enzorb-dsr"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/enzorb-dsr.jpg" alt="Enzorb-DSR — Rabeprazole Sodium + Domperidone" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Gastroenterology</div>
             <h3><a href="products/enzorb-dsr">Enzorb-DSR</a></h3>
@@ -229,7 +232,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#e2336b">
-          <a class="art" href="products/zerofin-sp" aria-label="Zerofin-SP details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/zerofin-sp.jpg" alt="Zerofin-SP — Aceclofenac + Paracetamol + Serratiopeptidase" width="640" height="414"></a>
+          <a class="art" href="products/zerofin-sp"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/zerofin-sp.jpg" alt="Zerofin-SP — Aceclofenac + Paracetamol + Serratiopeptidase" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Pain &amp; Inflammation</div>
             <h3><a href="products/zerofin-sp">Zerofin-SP</a></h3>
@@ -239,7 +242,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#0e9aa7">
-          <a class="art" href="products/calvion-max" aria-label="Calvion-Max details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/calvion-max.jpg" alt="Calvion-Max — Calcium Citrate + Calcitriol + more" width="640" height="414"></a>
+          <a class="art" href="products/calvion-max"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/calvion-max.jpg" alt="Calvion-Max — Calcium Citrate + Calcitriol + more" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Bone, Joint &amp; Gout</div>
             <h3><a href="products/calvion-max">Calvion-Max</a></h3>
@@ -249,7 +252,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#5a67d8">
-          <a class="art" href="products/nerviross-xt" aria-label="Nerviross-XT details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/nerviross-xt.jpg" alt="Nerviross-XT — Palmitoylethanolamide + Uridine Monophosphate + more" width="640" height="414"></a>
+          <a class="art" href="products/nerviross-xt"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/nerviross-xt.jpg" alt="Nerviross-XT — Palmitoylethanolamide + Uridine Monophosphate + more" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Neurology</div>
             <h3><a href="products/nerviross-xt">Nerviross-XT</a></h3>
@@ -259,7 +262,7 @@
           </div>
         </article>
         <article class="pc" style="--area:#1f9d55">
-          <a class="art" href="products/hb-lipo" aria-label="HB Lipo details"><span class="rxb">℞ Rx</span><img loading="lazy" src="images/products/thumbs/hb-lipo.jpg" alt="HB Lipo — Liposomal Ferric Pyrophosphate + Vitamin C + more" width="640" height="414"></a>
+          <a class="art" href="products/hb-lipo"><span class="rxb" aria-hidden="true">℞ Rx</span><img loading="lazy" src="images/products/thumbs/hb-lipo.jpg" alt="HB Lipo — Liposomal Ferric Pyrophosphate + Vitamin C + more" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">Nutrition &amp; Wellness</div>
             <h3><a href="products/hb-lipo">HB Lipo</a></h3>
@@ -318,10 +321,10 @@
       </div>
       <div class="contact">
         <div class="cards">
-          <div class="cc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><div><h4>Registered Office</h4><p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, Daskroi, Ahmedabad, Gujarat 382405</p><a class="ml" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Merlin+Sparsh+Koyli+Talav+Ahmedabad+382405">View on Google Maps →</a></div></div>
-          <div class="cc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></div><div><h4>Call / WhatsApp</h4><p><span data-cfg="phone"></span></p><p><span data-cfg="whatsapp"></span></p></div></div>
-          <div class="cc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div><h4>Email</h4><p><span data-cfg="email"></span></p></div></div>
-          <div class="cc" data-optional><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><h4>Business Hours</h4><p><span data-cfg="hours"></span></p></div></div>
+          <div class="cc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><div><h3>Registered Office</h3><p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, Daskroi, Ahmedabad, Gujarat 382405</p><a class="ml" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Merlin+Sparsh+Koyli+Talav+Ahmedabad+382405">View on Google Maps →</a></div></div>
+          <div class="cc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></div><div><h3>Call / WhatsApp</h3><p><span data-cfg="phone"></span></p><p><span data-cfg="whatsapp"></span></p></div></div>
+          <div class="cc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div><h3>Email</h3><p><span data-cfg="email"></span></p></div></div>
+          <div class="cc" data-optional><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><h3>Business Hours</h3><p><span data-cfg="hours"></span></p></div></div>
         </div>
         <form class="enq lead" id="enq" data-lead novalidate>
           <h3>Business Enquiry</h3>
@@ -354,7 +357,7 @@
 <footer>
   <div class="wrap fmain">
     <div>
-      <a class="logo" href="/" style="margin-bottom:18px"><img class="mk" src="images/brand/logo-mark.png" alt="" width="44" height="44"><span><b>KEIROSS</b><small>Lifescience</small></span></a>
+      <a class="logo" href="/" style="margin-bottom:18px"><img class="mk" src="images/brand/logo-mark-88.png" alt="" width="44" height="44"><span><b>KEIROSS</b><small>Lifescience</small></span></a>
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
     <div><h4>Categories</h4><ul><li><a href="products/anti-infectives/">Anti-infectives</a></li><li><a href="products/respiratory-allergy/">Respiratory &amp; Allergy</a></li><li><a href="products/gastroenterology/">Gastroenterology</a></li><li><a href="products/pain-inflammation/">Pain &amp; Inflammation</a></li><li><a href="products/corticosteroids/">Corticosteroids</a></li><li><a href="products/bone-joint-gout/">Bone, Joint &amp; Gout</a></li><li><a href="products/neurology/">Neurology</a></li><li><a href="products/nutrition-wellness/">Nutrition &amp; Wellness</a></li><li><a href="products/urology/">Urology</a></li></ul></div>
@@ -395,6 +398,8 @@ document.addEventListener("click", e => {
 
 /* slider */
 const slides = [...document.querySelectorAll(".slide")];
+/* hero2/3 load after the page so they don't compete with the first slide */
+addEventListener("load", () => slides.forEach(s => { if (s.dataset.bg) s.style.backgroundImage = `url(${s.dataset.bg})`; }));
 let cur = 0, timer;
 $("#dots").innerHTML = slides.map((_,i)=>`<button aria-label="Slide ${i+1}" class="${i?"":"on"}"></button>`).join("");
 const dots = [...$("#dots").children];

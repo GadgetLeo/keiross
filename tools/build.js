@@ -18,7 +18,7 @@ const formLabel = p => p.formLabel || FORM_PL[p.form] || p.form;
 const TYPE = { rx:"Prescription medicine (℞)", ayurvedic:"Ayurvedic proprietary medicine", nutra:"Nutraceutical" };
 const containsLbl = p => ({ Tablet:"Each tablet contains", Capsule:"Each capsule contains", Softgel:"Each softgel capsule contains", Injection:"Each vial contains", Syrup:"Composition", Suspension:"Each 5 ml contains" }[p.form] || "Composition");
 
-const LOGO = `<img class="mk" src="../images/brand/logo-mark.png" alt="" width="44" height="44">`;
+const LOGO = `<img class="mk" src="../images/brand/logo-mark-88.png" alt="" width="44" height="44">`;
 const I = {
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
@@ -122,7 +122,9 @@ ${o.noindex ? "" : `<link rel="canonical" href="${url}">\n`}${SITE.googleVerific
 <link rel="manifest" href="${r}site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+${o.preload ? `<link rel="preload" as="image" href="${r}${o.preload}" fetchpriority="high">\n` : ""}<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="${r}assets/site.css">
 <script type="application/ld+json">${ld}</script>`;
 }
@@ -137,7 +139,7 @@ function header(r = "../"){
   <div class="grp"><span class="i">${I.phone}<span data-cfg="phone"></span></span></div>
 </div></div>
 <header class="hdr"><div class="wrap">
-  <a class="logo" href="/" aria-label="Keiross Lifescience home">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
+  <a class="logo" href="/">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <nav class="menu" id="menu">
     <a href="/">Home</a>
@@ -182,7 +184,7 @@ function footer(r = "../"){
 function card(p){
   const a = AREAS[p.area];
   return `<article class="pc" style="--area:${a.hex}">
-    <a class="art" href="${p.slug}">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="../images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} product visual" width="640" height="414"></a>
+    <a class="art" href="${p.slug}">${p.type==="rx"?'<span class="rxb" aria-hidden="true">℞ Rx</span>':""}<img loading="lazy" src="../images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} product visual" width="640" height="414"></a>
     <div class="bd"><div class="ar">${esc(a.label)}</div><h3><a href="${p.slug}">${esc(p.brand)}</a></h3><div class="frm">${esc(formLabel(p))}</div><div class="cmp">${esc(p.composition)}</div>
     <div class="row"><a class="btn line-dark" href="${p.slug}">View details</a></div></div>
   </article>`;
@@ -742,7 +744,7 @@ const TILE_ICONS = {
   const feat = (FEATURED || []).map(s => PRODUCTS.find(p => p.slug === s)).filter(Boolean);
   const featured = `      <div class="pgrid feat">${feat.map(p => `
         <article class="pc" style="--area:${AREAS[p.area].hex}">
-          <a class="art" href="products/${p.slug}" aria-label="${esc(p.brand)} details">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} — ${esc(shortGeneric(p))}" width="640" height="414"></a>
+          <a class="art" href="products/${p.slug}">${p.type==="rx"?'<span class="rxb" aria-hidden="true">℞ Rx</span>':""}<img loading="lazy" src="images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} — ${esc(shortGeneric(p))}" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">${esc(AREAS[p.area].label)}</div>
             <h3><a href="products/${p.slug}">${esc(p.brand)}</a></h3>
@@ -768,7 +770,7 @@ const TILE_ICONS = {
   const head = pageHead({ r:"", path:"", title:"Keiross Lifescience Pvt. Ltd. | Pharmaceutical Company, Ahmedabad",
     ogTitle:"Keiross Lifescience — Caring for Healthy Life",
     desc:`Keiross Lifescience markets ${PRODUCTS.length} own-brand medicines and nutraceuticals across ${areas.length} categories to distributors, stockists, pharmacies, hospitals and clinics across India.`,
-    image:"images/products/cover.jpg", imageAlt:"Keiross Lifescience — Caring for Healthy Life", main:ORG_ID });
+    image:"images/products/cover.jpg", imageAlt:"Keiross Lifescience — Caring for Healthy Life", main:ORG_ID, preload:"images/hero1.jpg" });
   fs.writeFileSync(f, html.replace(/<!-- SEO:START[^>]*-->[\s\S]*?<!-- SEO:END -->/, m => m.slice(0, m.indexOf("-->") + 3) + "\n" + head + "\n<!-- SEO:END -->"));
 }
 
