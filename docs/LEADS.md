@@ -1,7 +1,8 @@
 # Where website enquiries go
 
 Every enquiry form on the site (the **Contact** page and the **home page**) posts to
-`/api/lead`, a Vercel serverless function in this repo (`api/lead.js`). Each new lead
+`/api/lead`, a serverless function in this repo — `functions/api/lead.js` on Cloudflare Pages
+(`api/lead.js` is the equivalent for Vercel). Each new lead
 reaches you three ways within seconds:
 
 | Channel | What you get | Setup |
@@ -9,7 +10,7 @@ reaches you three ways within seconds:
 | **Google Sheet** | One row per lead in a *Keiross Leads* sheet, with a *Status* dropdown (New → Called → Quoted → Won/Lost) and *Assigned to* / *Notes* columns. | Part 1 (10 min, free) |
 | **Gmail alert** | The same Google script emails the lead to `keirosslifesciencepvtltd@gmail.com` with **Call** / **Reply on WhatsApp** buttons. *Reply* goes straight to the customer. | included in Part 1 |
 | **WhatsApp alert** | A WhatsApp message to your phone via CallMeBot with the lead's name, phone and requirement. | Part 2 (3 min, free) |
-| Vercel logs (always on) | If every channel is down, the full lead is still written to the function log. | none |
+| Function logs (always on) | If every channel is down, the full lead is still written to the function log. | none |
 
 The visitor always sees a result:
 
@@ -40,6 +41,7 @@ Do this while logged in to **keirosslifesciencepvtltd@gmail.com** (alerts are se
    → **Deploy** → copy the **Web app URL** (ends in `/exec`).
 6. Send the **Web app URL** and the **SECRET** to your web developer, or add them yourself in
    Vercel → project **keiross** → **Settings → Environment Variables**:
+   (Cloudflare: project → Settings → Variables and Secrets — see docs/HOSTING.md)
    * `LEADS_SHEET_WEBHOOK` = the Web app URL
    * `LEADS_SHEET_SECRET` = the secret
    then redeploy.

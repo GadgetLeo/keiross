@@ -65,11 +65,11 @@ function orgNode(){
     "identifier": { "@type":"PropertyValue", "propertyID":"CIN", "value":"U46497GJ2026PTC173763" },
     "taxID": SITE.gstin || undefined, "email": SITE.email || undefined, "telephone": SITE.phone || undefined,
     "address": ADDRESS,
-    "contactPoint": [{ "@type":"ContactPoint", "contactType":"sales", "telephone": SITE.phone || undefined, "email": SITE.email || undefined, "areaServed":"IN", "availableLanguage":["English","Hindi","Gujarati"], "url": `${BASE}/contact.html` }],
+    "contactPoint": [{ "@type":"ContactPoint", "contactType":"sales", "telephone": SITE.phone || undefined, "email": SITE.email || undefined, "areaServed":"IN", "availableLanguage":["English","Hindi","Gujarati"], "url": `${BASE}/contact` }],
     "areaServed": { "@type":"Country", "name":"India" },
     "knowsAbout": Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => AREAS[k].label),
     "numberOfEmployees": undefined,
-    "member": TEAM.map(m => ({ "@type":"OrganizationRole", "roleName": m.role, "member": { "@type":"Person", "@id": `${BASE}/about.html#${m.name.toLowerCase().replace(/[^a-z]+/g, "-")}`, "name": m.name, "jobTitle": m.role } })),
+    "member": TEAM.map(m => ({ "@type":"OrganizationRole", "roleName": m.role, "member": { "@type":"Person", "@id": `${BASE}/about#${m.name.toLowerCase().replace(/[^a-z]+/g, "-")}`, "name": m.name, "jobTitle": m.role } })),
     "sameAs": (SITE.sameAs || []).length ? SITE.sameAs : undefined
   };
 }
@@ -141,17 +141,17 @@ function header(r = "../"){
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <nav class="menu" id="menu">
     <a href="/">Home</a>
-    <a href="../about.html">About Us</a>
+    <a href="../about">About Us</a>
     <div class="dd"><a href="../products/">Products</a><button class="ddt" type="button" aria-label="Show products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
       <div class="drop mega"><div class="mcols">
         ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<div class="mcol"><a class="mh" href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a><button class="subt" type="button" aria-label="Show ${esc(AREAS[k].label)} products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
-          <ul>${PRODUCTS.filter(p => p.area===k).map(p => `<li><a href="../products/${p.slug}.html">${esc(p.brand)}</a></li>`).join("")}</ul></div>`).join("\n        ")}
+          <ul>${PRODUCTS.filter(p => p.area===k).map(p => `<li><a href="../products/${p.slug}">${esc(p.brand)}</a></li>`).join("")}</ul></div>`).join("\n        ")}
       </div>
       <div class="mfoot"><a href="../products/">View all products</a><span>${PRODUCTS.length} brands across ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).length} categories</span></div></div>
     </div>
-    <a href="../contact.html?type=Distributor">Distributors</a>
-    <a href="../contact.html">Contact Us</a>
-    <a class="btn" href="../contact.html">Enquire Now</a>
+    <a href="../contact?type=Distributor">Distributors</a>
+    <a href="../contact">Contact Us</a>
+    <a class="btn" href="../contact">Enquire Now</a>
   </nav>
 </div></header>`, r);
 }
@@ -165,7 +165,7 @@ function footer(r = "../"){
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
     <div><h4>Categories</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
-    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact.html?type=Distributor">Distributors</a></li><li><a href="../contact.html">Contact Us</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="../about">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact?type=Distributor">Distributors</a></li><li><a href="../contact">Contact Us</a></li></ul></div>
     <div><h4>Registered Office</h4>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
       <p><span data-cfg="phone"></span></p><p><span data-cfg="email"></span></p>
@@ -182,15 +182,15 @@ function footer(r = "../"){
 function card(p){
   const a = AREAS[p.area];
   return `<article class="pc" style="--area:${a.hex}">
-    <a class="art" href="${p.slug}.html">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="../images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} product visual" width="640" height="414"></a>
-    <div class="bd"><div class="ar">${esc(a.label)}</div><h3><a href="${p.slug}.html">${esc(p.brand)}</a></h3><div class="frm">${esc(formLabel(p))}</div><div class="cmp">${esc(p.composition)}</div>
-    <div class="row"><a class="btn line-dark" href="${p.slug}.html">View details</a></div></div>
+    <a class="art" href="${p.slug}">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="../images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} product visual" width="640" height="414"></a>
+    <div class="bd"><div class="ar">${esc(a.label)}</div><h3><a href="${p.slug}">${esc(p.brand)}</a></h3><div class="frm">${esc(formLabel(p))}</div><div class="cmp">${esc(p.composition)}</div>
+    <div class="row"><a class="btn line-dark" href="${p.slug}">View details</a></div></div>
   </article>`;
 }
 
 function page(p){
   const a = AREAS[p.area];
-  const url = `${BASE}/products/${p.slug}.html`;
+  const url = `${BASE}/products/${p.slug}`;
   const desc = `${p.brand} ${formLabel(p)} (${p.composition}) by Keiross Lifescience for ${p.indications.slice(0,4).join(", ").toLowerCase()}.`;
   const related = PRODUCTS.filter(x => x.area===p.area && x.slug!==p.slug).concat(PRODUCTS.filter(x => x.area!==p.area)).slice(0,4);
   const route = { Tablet:"Oral", Capsule:"Oral", Softgel:"Oral", Syrup:"Oral", Suspension:"Oral" }[p.form];
@@ -217,15 +217,15 @@ function page(p){
       </section>` : "";
   const variants = p.variants.length ? `
       <section class="psec"><h2>Also available</h2><div class="vgrid">
-        ${p.variants.map(v=>`<div class="vcard"><b>${esc(v.brand)}</b><span class="fb">${esc(FORM_PL[v.form]||v.form)}</span><p>${esc(v.composition)}</p><a class="btn line-dark sm" href="../contact.html?product=${encodeURIComponent(v.brand)}">Enquire</a></div>`).join("")}
+        ${p.variants.map(v=>`<div class="vcard"><b>${esc(v.brand)}</b><span class="fb">${esc(FORM_PL[v.form]||v.form)}</span><p>${esc(v.composition)}</p><a class="btn line-dark sm" href="../contact?product=${encodeURIComponent(v.brand)}">Enquire</a></div>`).join("")}
       </div></section>` : "";
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-${pageHead({ r:"../", path:`products/${p.slug}.html`, title, ogTitle:`${p.brand} ${formLabel(p)} — Keiross Lifescience`, desc, type:"ItemPage", ogType:"product",
+${pageHead({ r:"../", path:`products/${p.slug}`, title, ogTitle:`${p.brand} ${formLabel(p)} — Keiross Lifescience`, desc, type:"ItemPage", ogType:"product",
   image:`images/products/${p.slug}.jpg`, imageAlt:`${p.brand} — ${p.composition}`,
-  crumbs:[["Home",""],["Products","products/"],[a.label,`products/${AREAS[p.area].slug}/`],[p.brand,`products/${p.slug}.html`]], main:product, extra })}
+  crumbs:[["Home",""],["Products","products/"],[a.label,`products/${AREAS[p.area].slug}/`],[p.brand,`products/${p.slug}`]], main:product, extra })}
 </head>
 <body class="ppage" style="--area:${a.hex}">
 ${header()}
@@ -245,7 +245,7 @@ ${header()}
       <p class="tag">“${esc(p.tagline)}”</p>
       <div class="acts">
         <button class="btn" data-enq data-via="wa">${I.wa} WhatsApp Enquiry</button>
-        <a class="btn blue" href="../contact.html?product=${encodeURIComponent(p.brand)}">Send Enquiry</a>
+        <a class="btn blue" href="../contact?product=${encodeURIComponent(p.brand)}">Send Enquiry</a>
       </div>
       <small class="fine">${p.type==="rx"?"Prescription medicine — supplied to licensed trade buyers and for use under medical supervision only.":"Supplied to the trade. Read the label before use."}</small>
     </div>
@@ -273,7 +273,7 @@ ${header()}
           <tr><td>Pack size</td><td>On enquiry</td></tr>
           <tr><td>Marketed by</td><td>Keiross Lifescience Pvt. Ltd., Ahmedabad</td></tr>
         </table>
-        <a class="btn full" href="../contact.html?product=${encodeURIComponent(p.brand)}">Request trade price</a>
+        <a class="btn full" href="../contact?product=${encodeURIComponent(p.brand)}">Request trade price</a>
       </div>
     </aside>
   </div>
@@ -294,7 +294,7 @@ document.addEventListener("click", e => {
   let item = P;
   if (v){ const [brand, composition] = v.dataset.enqVariant.split("|"); item = { brand, composition }; }
   const m = enquiryText(item);
-  if (!send(m.text, m.subject, b ? b.dataset.via : "wa")) location.href = "../contact.html?product=" + encodeURIComponent(item.brand);
+  if (!send(m.text, m.subject, b ? b.dataset.via : "wa")) location.href = "../contact?product=" + encodeURIComponent(item.brand);
 });
 </script>
 </body>
@@ -323,9 +323,9 @@ function aboutPage(){
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-${pageHead({ r:"", path:"about.html", title:"About Us | Keiross Lifescience Pvt. Ltd.", ogTitle:"About Keiross Lifescience",
+${pageHead({ r:"", path:"about", title:"About Us | Keiross Lifescience Pvt. Ltd.", ogTitle:"About Keiross Lifescience",
   desc:`Keiross Lifescience Private Limited is an Ahmedabad-based pharmaceutical company marketing ${PRODUCTS.length} own-brand medicines across ${areas.length} categories. Meet our directors.`,
-  type:"AboutPage", crumbs:[["Home",""],["About Us","about.html"]], main:ORG_ID })}
+  type:"AboutPage", crumbs:[["Home",""],["About Us","about"]], main:ORG_ID })}
 </head>
 <body>
 ${header("")}
@@ -401,7 +401,7 @@ ${header("")}
     <div class="wrap">
       <h2>Looking to partner with a growing pharmaceutical brand?</h2>
       <p>Distributors, stockists and institutional buyers are welcome to send us an enquiry.</p>
-      <a class="btn" href="contact.html">Contact Us</a>
+      <a class="btn" href="contact">Contact Us</a>
     </div>
   </section>
 </main>
@@ -426,7 +426,7 @@ function productsHub(){
       <article class="catcard" style="--area:${A.hex}">
         <h2><a href="${A.slug}/">${esc(A.label)}</a></h2>
         <p>${esc(A.short || A.intro || "")}</p>
-        <ul>${list.map(p => `<li><a href="${p.slug}.html">${esc(p.brand)}</a><span>${esc(formLabel(p))} · ${esc(shortGeneric(p))}</span></li>`).join("")}</ul>
+        <ul>${list.map(p => `<li><a href="${p.slug}">${esc(p.brand)}</a><span>${esc(formLabel(p))} · ${esc(shortGeneric(p))}</span></li>`).join("")}</ul>
         <a class="more" href="${A.slug}/">View ${esc(A.label)}<span aria-hidden="true"> →</span></a>
       </article>`;
   };
@@ -459,7 +459,7 @@ ${header()}
     <div class="wrap">
       <h2>Need a product or a price list?</h2>
       <p>Send us your requirement and our team will share availability, pack sizes and trade terms.</p>
-      <a class="btn" href="../contact.html">Send an Enquiry</a>
+      <a class="btn" href="../contact">Send an Enquiry</a>
     </div>
   </section>
 </main>
@@ -487,9 +487,9 @@ function contactPage(){
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-${pageHead({ r:"", path:"contact.html", title:"Contact Us | Trade Enquiries | Keiross Lifescience", ogTitle:"Contact Keiross Lifescience",
+${pageHead({ r:"", path:"contact", title:"Contact Us | Trade Enquiries | Keiross Lifescience", ogTitle:"Contact Keiross Lifescience",
   desc:`Contact Keiross Lifescience for distributorship, stockist, pharmacy and hospital enquiries, price lists and trade terms. Call or WhatsApp ${SITE.phone || ""}.`,
-  type:"ContactPage", crumbs:[["Home",""],["Contact Us","contact.html"]], main:ORG_ID })}
+  type:"ContactPage", crumbs:[["Home",""],["Contact Us","contact"]], main:ORG_ID })}
 </head>
 <body>
 ${header("")}
@@ -571,7 +571,7 @@ fs.writeFileSync(path.join(ROOT, "contact.html"), contactPage());
 /* ---------------- products/<area>/index.html (category pages) ---------------- */
 function categoryPage(k){
   const A = AREAS[k], list = PRODUCTS.filter(p => p.area===k);
-  const rel2 = h => h.replace(/href="([a-z0-9-]+)\.html"/g, 'href="../$1.html"').replace(/src="\.\.\/images/g, 'src="../../images');
+  const rel2 = h => h.replace(/href="([a-z0-9-]+)"/g, 'href="../$1"').replace(/src="\.\.\/images/g, 'src="../../images');
   const others = Object.keys(AREAS).filter(x => x !== k && PRODUCTS.some(p => p.area===x));
   const url = `${BASE}/products/${A.slug}/`;
   const molecules = [...new Set(list.flatMap(p => shortGeneric(p).replace(" + more", "").split(" + ")))].slice(0, 8);
@@ -583,7 +583,7 @@ ${pageHead({ r:"../../", path:`products/${A.slug}/`, title:`${A.label} Brands | 
   desc, type:"CollectionPage", image:`images/products/${list[0].slug}.jpg`,
   crumbs:[["Home",""],["Products","products/"],[A.label,`products/${A.slug}/`]],
   main:{ "@type":"ItemList", "@id":`${url}#itemlist`, "name":`${A.label} — Keiross Lifescience`, "numberOfItems":list.length,
-    "itemListElement": list.map((p, i) => ({ "@type":"ListItem", "position":i+1, "name":p.brand, "url":`${BASE}/products/${p.slug}.html` })) } })}
+    "itemListElement": list.map((p, i) => ({ "@type":"ListItem", "position":i+1, "name":p.brand, "url":`${BASE}/products/${p.slug}` })) } })}
 </head>
 <body style="--area:${A.hex}">
 ${header("../../")}
@@ -611,7 +611,7 @@ ${header("../../")}
     <div class="wrap">
       <h2>Interested in our ${esc(A.label.toLowerCase())} range?</h2>
       <p>Send us your requirement for availability, pack sizes and trade terms.</p>
-      <a class="btn" href="../../contact.html">Send an Enquiry</a>
+      <a class="btn" href="../../contact">Send an Enquiry</a>
     </div>
   </section>
 </main>
@@ -650,13 +650,13 @@ const TILE_ICONS = {
   const feat = (FEATURED || []).map(s => PRODUCTS.find(p => p.slug === s)).filter(Boolean);
   const featured = `      <div class="pgrid feat">${feat.map(p => `
         <article class="pc" style="--area:${AREAS[p.area].hex}">
-          <a class="art" href="products/${p.slug}.html" aria-label="${esc(p.brand)} details">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} — ${esc(shortGeneric(p))}" width="640" height="414"></a>
+          <a class="art" href="products/${p.slug}" aria-label="${esc(p.brand)} details">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} — ${esc(shortGeneric(p))}" width="640" height="414"></a>
           <div class="bd">
             <div class="ar">${esc(AREAS[p.area].label)}</div>
-            <h3><a href="products/${p.slug}.html">${esc(p.brand)}</a></h3>
+            <h3><a href="products/${p.slug}">${esc(p.brand)}</a></h3>
             <div class="frm">${esc(formLabel(p))}</div>
             <div class="cmp">${esc(shortGeneric(p))}</div>
-            <div class="row"><a class="btn line-dark" href="products/${p.slug}.html">Details</a><a class="btn" href="contact.html?product=${encodeURIComponent(p.brand)}">Enquire</a></div>
+            <div class="row"><a class="btn line-dark" href="products/${p.slug}">Details</a><a class="btn" href="contact?product=${encodeURIComponent(p.brand)}">Enquire</a></div>
           </div>
         </article>`).join("")}
       </div>
@@ -693,7 +693,7 @@ ${header("/")}
     <b>404</b>
     <h1>Page not found</h1>
     <p>The page you're looking for may have moved. Try our product catalogue or get in touch.</p>
-    <div class="acts"><a class="btn" href="/products/">Browse products</a><a class="btn line-dark" href="/contact.html">Contact us</a><a class="btn line-dark" href="/">Home</a></div>
+    <div class="acts"><a class="btn" href="/products/">Browse products</a><a class="btn line-dark" href="/contact">Contact us</a><a class="btn line-dark" href="/">Home</a></div>
   </div></section>
 </main>
 ${footer("/")}
@@ -720,11 +720,11 @@ ${[
   smUrl("", "1.0", smImg("images/products/cover.jpg", "Keiross Lifescience")),
   smUrl("products/", "0.9"),
   ...Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => smUrl(`products/${AREAS[k].slug}/`, "0.8")),
-  ...PRODUCTS.map(p => smUrl(`products/${p.slug}.html`, "0.8", smImg(`images/products/${p.slug}.jpg`, `${p.brand} ${formLabel(p)} — ${p.composition}`))),
-  smUrl("about.html", "0.6"),
-  smUrl("contact.html", "0.7")
+  ...PRODUCTS.map(p => smUrl(`products/${p.slug}`, "0.8", smImg(`images/products/${p.slug}.jpg`, `${p.brand} ${formLabel(p)} — ${p.composition}`))),
+  smUrl("about", "0.6"),
+  smUrl("contact", "0.7")
 ].join("\n")}
 </urlset>
 `);
 fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${BASE}/sitemap.xml\n`);
-console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about.html + contact.html + index <head> + 404 + sitemap.xml`);
+console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about + contact + index <head> + 404 + sitemap.xml`);
