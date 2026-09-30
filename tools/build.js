@@ -9,7 +9,7 @@ vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "data/products.js"), "utf8"), ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "data/site.js"), "utf8"), ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "data/team.js"), "utf8"), ctx);
-const { AREAS, PRODUCTS, SITE, TEAM } = ctx.window;
+const { AREAS, PRODUCTS, SITE, TEAM, FEATURED } = ctx.window;
 const BASE = (SITE.url || "").replace(/\/$/, "");
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -137,16 +137,19 @@ function header(r = "../"){
   <div class="grp"><span class="i">${I.phone}<span data-cfg="phone"></span></span></div>
 </div></div>
 <header class="hdr"><div class="wrap">
-  <a class="logo" href="../index.html" aria-label="Keiross Lifescience home">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
+  <a class="logo" href="/" aria-label="Keiross Lifescience home">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <nav class="menu" id="menu">
-    <a href="../index.html">Home</a>
+    <a href="/">Home</a>
     <a href="../about.html">About Us</a>
-    <div class="dd"><a href="../products/">Products ▾</a><div class="drop">
-      <a href="../products/">All Products</a>
-      ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<a href="../products/#${k}">${esc(AREAS[k].label)}</a>`).join("")}
-    </div></div>
-    <a href="../index.html#serve">Distributors</a>
+    <div class="dd"><a href="../products/">Products</a><button class="ddt" type="button" aria-label="Show product categories" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="drop mega">
+        <a class="all" href="../products/">All products <b>${PRODUCTS.length}</b></a>
+        ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => { const list = PRODUCTS.filter(p => p.area===k); return `<div class="sub" style="--area:${AREAS[k].hex}"><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}<span class="n">${list.length}</span></a><button class="subt" type="button" aria-label="Show ${esc(AREAS[k].label)} products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="fly"><div class="fh">${esc(AREAS[k].label)}</div>${list.map(p => `<a href="../products/${p.slug}.html"><b>${esc(p.brand)}</b><small>${esc(formLabel(p))} · ${esc(shortGeneric(p))}</small></a>`).join("")}</div></div>`; }).join("\n        ")}
+      </div>
+    </div>
+    <a href="../contact.html?type=Distributor">Distributors</a>
     <a href="../contact.html">Contact Us</a>
     <a class="btn" href="../contact.html">Enquire Now</a>
   </nav>
@@ -158,11 +161,11 @@ function footer(r = "../"){
 <footer>
   <div class="wrap fmain">
     <div>
-      <a class="logo" href="../index.html" style="margin-bottom:18px">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
+      <a class="logo" href="/" style="margin-bottom:18px">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
-    <div><h4>Therapy Areas</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/#${k}">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
-    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../index.html#serve">Distributors</a></li><li><a href="../contact.html">Contact Us</a></li></ul></div>
+    <div><h4>Therapy Areas</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
+    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact.html?type=Distributor">Distributors</a></li><li><a href="../contact.html">Contact Us</a></li></ul></div>
     <div><h4>Registered Office</h4>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
       <p><span data-cfg="phone"></span></p><p><span data-cfg="email"></span></p>
@@ -222,12 +225,12 @@ function page(p){
 <head>
 ${pageHead({ r:"../", path:`products/${p.slug}.html`, title, ogTitle:`${p.brand} ${formLabel(p)} — Keiross Lifescience`, desc, type:"ItemPage", ogType:"product",
   image:`images/products/${p.slug}.jpg`, imageAlt:`${p.brand} — ${p.composition}`,
-  crumbs:[["Home",""],["Products","products/"],[a.label,`products/#${p.area}`],[p.brand,`products/${p.slug}.html`]], main:product, extra })}
+  crumbs:[["Home",""],["Products","products/"],[a.label,`products/${AREAS[p.area].slug}/`],[p.brand,`products/${p.slug}.html`]], main:product, extra })}
 </head>
 <body class="ppage" style="--area:${a.hex}">
 ${header()}
 <main>
-  <div class="crumbs"><div class="wrap"><a href="../index.html">Home</a><span>/</span><a href="../products/">Products</a><span>/</span><a href="../products/#${p.area}">${esc(a.label)}</a><span>/</span><b>${esc(p.brand)}</b></div></div>
+  <div class="crumbs"><div class="wrap"><a href="/">Home</a><span>/</span><a href="../products/">Products</a><span>/</span><a href="../products/${AREAS[p.area].slug}/">${esc(a.label)}</a><span>/</span><b>${esc(p.brand)}</b></div></div>
 
   <section class="phero"><div class="wrap">
     <a class="pvis" href="../images/products/${p.slug}.jpg" target="_blank" rel="noopener" aria-label="Open full-size ${esc(p.brand)} brochure page">
@@ -329,7 +332,7 @@ ${header("")}
 <main>
   <section class="pagehero">
     <div class="wrap">
-      <div class="crumb"><a href="index.html">Home</a><span>/</span>About Us</div>
+      <div class="crumb"><a href="/">Home</a><span>/</span>About Us</div>
       <h1>Caring for <span>healthy life</span></h1>
       <p>A young pharmaceutical company building a trusted portfolio of own-brand medicines for doctors, pharmacies and distributors across India.</p>
     </div>
@@ -376,7 +379,7 @@ ${header("")}
         <h2>Registration <span>&amp; compliance</span></h2>
         <p>Keiross Lifescience is a private limited company registered with the Ministry of Corporate Affairs, Government of India.</p>
         <h3 class="ta">Therapy areas</h3>
-        <div class="chips">${areas.map(k => `<a class="chip" style="--area:${AREAS[k].hex}" href="products/#${k}">${esc(AREAS[k].label)}</a>`).join("")}</div>
+        <div class="chips">${areas.map(k => `<a class="chip" style="--area:${AREAS[k].hex}" href="products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a>`).join("")}</div>
       </div>
       <div class="ftable">
         <table>
@@ -441,7 +444,7 @@ ${header()}
 <main>
   <section class="pagehero">
     <div class="wrap">
-      <div class="crumb"><a href="../index.html">Home</a><span>/</span>Products</div>
+      <div class="crumb"><a href="/">Home</a><span>/</span>Products</div>
       <h1>Our <span>Products</span></h1>
       <p>${PRODUCTS.length} own brands and ${variantCount} variants across ${areas.length} therapy areas — tablets, capsules, syrups, suspensions and injections for distributors, pharmacies, hospitals and clinics.</p>
     </div>
@@ -514,7 +517,7 @@ ${header("")}
 <main>
   <section class="pagehero">
     <div class="wrap">
-      <div class="crumb"><a href="index.html">Home</a><span>/</span>Contact Us</div>
+      <div class="crumb"><a href="/">Home</a><span>/</span>Contact Us</div>
       <h1>Let's <span>work together</span></h1>
       <p>Distributorship, stockist and institutional enquiries, product availability, price lists and trade terms — send us your requirement and our team will get back to you within one business day.</p>
     </div>
@@ -586,6 +589,106 @@ ${footer("")}
 }
 fs.writeFileSync(path.join(ROOT, "contact.html"), contactPage());
 
+/* ---------------- products/<area>/index.html (category pages) ---------------- */
+function categoryPage(k){
+  const A = AREAS[k], list = PRODUCTS.filter(p => p.area===k);
+  const rel2 = h => h.replace(/href="([a-z0-9-]+)\.html"/g, 'href="../$1.html"').replace(/src="\.\.\/images/g, 'src="../../images');
+  const others = Object.keys(AREAS).filter(x => x !== k && PRODUCTS.some(p => p.area===x));
+  const url = `${BASE}/products/${A.slug}/`;
+  const molecules = [...new Set(list.flatMap(p => shortGeneric(p).replace(" + more", "").split(" + ")))].slice(0, 8);
+  const desc = `${A.label} medicines from Keiross Lifescience: ${list.map(p => p.brand).join(", ")}. ${A.intro || ""}`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+${pageHead({ r:"../../", path:`products/${A.slug}/`, title:`${A.label} Brands | ${list.length} Product${list.length>1?"s":""} | Keiross Lifescience`, ogTitle:`${A.label} — Keiross Lifescience`,
+  desc, type:"CollectionPage", image:`images/products/${list[0].slug}.jpg`,
+  crumbs:[["Home",""],["Products","products/"],[A.label,`products/${A.slug}/`]],
+  main:{ "@type":"ItemList", "@id":`${url}#itemlist`, "name":`${A.label} — Keiross Lifescience`, "numberOfItems":list.length,
+    "itemListElement": list.map((p, i) => ({ "@type":"ListItem", "position":i+1, "name":p.brand, "url":`${BASE}/products/${p.slug}.html` })) } })}
+</head>
+<body style="--area:${A.hex}">
+${header("../../")}
+<main>
+  <section class="pagehero cat">
+    <div class="wrap">
+      <div class="crumb"><a href="/">Home</a><span>/</span><a href="../">Products</a><span>/</span>${esc(A.label)}</div>
+      <h1>${esc(A.label)}</h1>
+      <p>${esc(A.intro || "")}</p>
+      <div class="mol">${molecules.map(m => `<span>${esc(m)}</span>`).join("")}</div>
+    </div>
+  </section>
+  <div class="wrap hub">
+    <section class="area" style="--area:${A.hex}">
+      <div class="ahead"><h2>${list.length} ${esc(A.label)} brand${list.length>1?"s":""}</h2></div>
+      <div class="pgrid">${rel2(list.map(card).join(""))}</div>
+    </section>
+    <section class="area">
+      <div class="ahead" style="--area:var(--teal)"><h2>Other therapy areas</h2></div>
+      <div class="chips others">${others.map(x => `<a class="chip" style="--area:${AREAS[x].hex}" href="../${AREAS[x].slug}/">${esc(AREAS[x].label)} <b>${PRODUCTS.filter(p => p.area===x).length}</b></a>`).join("")}<a class="chip" href="../">All products</a></div>
+    </section>
+    <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
+  </div>
+  <section class="cta-band">
+    <div class="wrap">
+      <h2>Interested in our ${esc(A.label.toLowerCase())} range?</h2>
+      <p>Send us your requirement for availability, pack sizes and trade terms.</p>
+      <a class="btn" href="../../contact.html">Send an Enquiry</a>
+    </div>
+  </section>
+</main>
+${footer("../../")}
+<script src="../../data/site.js"></script>
+<script src="../../assets/common.js"></script>
+</body>
+</html>
+`;
+}
+for (const k of Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k))){
+  fs.mkdirSync(path.join(ROOT, "products", AREAS[k].slug), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, "products", AREAS[k].slug, "index.html"), categoryPage(k));
+}
+
+/* ---------------- index.html body blocks (between markers) ---------------- */
+const TILE_ICONS = {
+  anti:'<path d="M12 2.8l8 3v6c0 5-3.4 8.5-8 9.7-4.6-1.2-8-4.7-8-9.7v-6z"/><path d="M12 8v7M8.5 11.5h7"/>',
+  resp:'<path d="M12 3v8"/><path d="M12 11c-1.3-.6-3 0-3 2v5.5c0 1.4-1.2 2.5-2.8 2.5C4.4 21 3 19.6 3 17.5V14c0-4.5 2.2-8 5-8 .9 0 1.6.7 1.6 1.6"/><path d="M12 11c1.3-.6 3 0 3 2v5.5c0 1.4 1.2 2.5 2.8 2.5 1.8 0 3.2-1.4 3.2-3.5V14c0-4.5-2.2-8-5-8-.9 0-1.6.7-1.6 1.6"/>',
+  gastro:'<path d="M9 2.5v4.2c0 1.8-1.4 2.8-3 3.6-2.6 1.3-3 5.4-.6 8 2.6 2.8 7.4 3.4 10.8 1.2 3.4-2.2 5-6.6 3.6-9.8-1.1-2.5-3.9-2.8-5.6-1.5-1.3 1-3.2.3-3.2-1.6V2.5"/>',
+  pain:'<path d="M13 2L4.5 13.5H12L11 22l8.5-11.5H12z"/>',
+  steroid:'<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.2 7.9l5.6 8.2"/>',
+  bone:'<path d="M8 5.2a2.4 2.4 0 1 0-3.2 3.2 2.4 2.4 0 1 0 2.9 2.9l5 5a2.4 2.4 0 1 0 2.9 2.9 2.4 2.4 0 1 0 3.2-3.2 2.4 2.4 0 1 0-2.9-2.9l-5-5A2.4 2.4 0 0 0 8 5.2z"/>',
+  neuro:'<circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6M5.6 5.6l4.3 4.3M14.1 14.1l4.3 4.3M18.4 5.6l-4.3 4.3M9.9 14.1l-4.3 4.3"/>',
+  nutra:'<path d="M5 19.5C5 10.8 10.6 4.5 20 4.5c0 9.4-6.3 15-15 15z"/><path d="M5 19.5l8-8"/>',
+  uro:'<path d="M12 3c-3 4.5-6 7.8-6 11a6 6 0 0 0 12 0c0-3.2-3-6.5-6-11z"/>'
+};
+{
+  const f = path.join(ROOT, "index.html");
+  let html = fs.readFileSync(f, "utf8");
+  const fill = (name, content) => { html = html.replace(new RegExp(`(<!-- ${name}:START[^>]*-->)[\\s\\S]*?(\\s*<!-- ${name}:END -->)`), (m, a, b) => `${a}\n${content}${b}`); };
+  const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
+  const tiles = `      <div class="tiles">${areas.map(k => { const n = PRODUCTS.filter(p => p.area===k).length; return `
+        <a class="tile" href="products/${AREAS[k].slug}/" style="--area:${AREAS[k].hex}"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${TILE_ICONS[k] || ""}</svg></div><h3>${esc(AREAS[k].label)}</h3><span>${n} brand${n > 1 ? "s" : ""}</span></a>`; }).join("")}
+      </div>`;
+  const feat = (FEATURED || []).map(s => PRODUCTS.find(p => p.slug === s)).filter(Boolean);
+  const featured = `      <div class="pgrid feat">${feat.map(p => `
+        <article class="pc" style="--area:${AREAS[p.area].hex}">
+          <a class="art" href="products/${p.slug}.html" aria-label="${esc(p.brand)} details">${p.type==="rx"?'<span class="rxb">℞ Rx</span>':""}<img loading="lazy" src="images/products/thumbs/${p.slug}.jpg" alt="${esc(p.brand)} — ${esc(shortGeneric(p))}" width="640" height="414"></a>
+          <div class="bd">
+            <div class="ar">${esc(AREAS[p.area].label)}</div>
+            <h3><a href="products/${p.slug}.html">${esc(p.brand)}</a></h3>
+            <div class="frm">${esc(formLabel(p))}</div>
+            <div class="cmp">${esc(shortGeneric(p))}</div>
+            <div class="row"><a class="btn line-dark" href="products/${p.slug}.html">Details</a><a class="btn" href="contact.html?product=${encodeURIComponent(p.brand)}">Enquire</a></div>
+          </div>
+        </article>`).join("")}
+      </div>
+      <div class="showall"><a class="btn blue" href="products/">View all ${PRODUCTS.length} products →</a><span>${areas.length} therapy areas · tablets, capsules, syrups, suspensions &amp; injections</span></div>`;
+  fill("HEADER", header(""));
+  fill("TILES", tiles);
+  fill("FEATURED", featured);
+  fill("FOOTER", footer(""));
+  fs.writeFileSync(f, html);
+}
+
 /* ---------------- index.html <head> (between SEO markers) ---------------- */
 {
   const f = path.join(ROOT, "index.html");
@@ -637,6 +740,7 @@ fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
 ${[
   smUrl("", "1.0", smImg("images/products/cover.jpg", "Keiross Lifescience")),
   smUrl("products/", "0.9"),
+  ...Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => smUrl(`products/${AREAS[k].slug}/`, "0.8")),
   ...PRODUCTS.map(p => smUrl(`products/${p.slug}.html`, "0.8", smImg(`images/products/${p.slug}.jpg`, `${p.brand} ${formLabel(p)} — ${p.composition}`))),
   smUrl("about.html", "0.6"),
   smUrl("contact.html", "0.7")
