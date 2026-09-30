@@ -358,3 +358,5 @@ dialog::backdrop{background:rgba(4,22,40,.62)}
 .bcard:only-child .ticks{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));column-gap:24px}
 .bgrid:has(> .bcard:only-child){grid-template-columns:1fr}
 @media (max-width:480px){.pc .ar{font-size:10px;letter-spacing:.4px}}
+.logo img.mk{width:44px;height:44px;object-fit:contain}
+footer .logo img.mk{background:#fff;border-radius:10px;padding:4px}

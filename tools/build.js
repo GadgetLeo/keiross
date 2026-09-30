@@ -17,7 +17,7 @@ const formLabel = p => p.formLabel || FORM_PL[p.form] || p.form;
 const TYPE = { rx:"Prescription medicine (℞)", ayurvedic:"Ayurvedic proprietary medicine", nutra:"Nutraceutical" };
 const containsLbl = p => ({ Tablet:"Each tablet contains", Capsule:"Each capsule contains", Softgel:"Each softgel capsule contains", Injection:"Each vial contains", Syrup:"Composition", Suspension:"Each 5 ml contains" }[p.form] || "Composition");
 
-const LOGO = `<svg class="mk" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#0b4f8a"/><path d="M19 11h10v8h8v10h-8v8H19v-8h-8V19h8z" fill="#10a393"/><path d="M21.5 16v16M21.5 24l7-8M21.5 24l7 8" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+const LOGO = `<img class="mk" src="../images/brand/logo-mark.png" alt="" width="44" height="44">`;
 const I = {
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
@@ -127,8 +127,9 @@ function page(p){
 <meta property="og:type" content="product">
 <meta property="og:url" content="${url}">
 <meta property="og:image" content="${BASE}/images/products/${p.slug}.jpg">
-<meta name="theme-color" content="#0b4f8a">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b4f8a'/%3E%3Cpath d='M19 11h10v8h8v10h-8v8H19v-8h-8V19h8z' fill='%2310a393'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="../images/brand/favicon.png">
+<link rel="apple-touch-icon" href="../images/brand/logo-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
