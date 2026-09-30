@@ -42,9 +42,9 @@ function header(r = "../"){
   <nav class="menu" id="menu">
     <a href="../index.html">Home</a>
     <a href="../about.html">About Us</a>
-    <div class="dd"><a href="../index.html#products">Products ▾</a><div class="drop">
-      <a href="../index.html#products">All Products</a>
-      ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<a href="../index.html?area=${k}#products">${esc(AREAS[k].label)}</a>`).join("")}
+    <div class="dd"><a href="../products/">Products ▾</a><div class="drop">
+      <a href="../products/">All Products</a>
+      ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<a href="../products/#${k}">${esc(AREAS[k].label)}</a>`).join("")}
     </div></div>
     <a href="../index.html#serve">Distributors</a>
     <a href="../index.html#contact">Contact Us</a>
@@ -61,8 +61,8 @@ function footer(r = "../"){
       <a class="logo" href="../index.html" style="margin-bottom:18px">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
-    <div><h4>Therapy Areas</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../index.html?area=${k}#products">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
-    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../index.html#products">Products</a></li><li><a href="../index.html#serve">Distributors</a></li><li><a href="../index.html#contact">Contact Us</a></li></ul></div>
+    <div><h4>Therapy Areas</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/#${k}">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
+    <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../index.html#serve">Distributors</a></li><li><a href="../index.html#contact">Contact Us</a></li></ul></div>
     <div><h4>Registered Office</h4>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
       <p><span data-cfg="phone"></span></p><p><span data-cfg="email"></span></p>
@@ -101,7 +101,7 @@ function page(p){
       }, p.type==="rx" ? { "dosageForm": p.form, "prescriptionStatus":"https://schema.org/PrescriptionOnly" } : {}),
       { "@type":"BreadcrumbList", "itemListElement":[
         { "@type":"ListItem","position":1,"name":"Home","item":`${BASE}/` },
-        { "@type":"ListItem","position":2,"name":"Products","item":`${BASE}/#products` },
+        { "@type":"ListItem","position":2,"name":"Products","item":`${BASE}/products/` },
         { "@type":"ListItem","position":3,"name":p.brand,"item":url }
       ]}
     ]
@@ -144,7 +144,7 @@ function page(p){
 <body class="ppage" style="--area:${a.hex}">
 ${header()}
 <main>
-  <div class="crumbs"><div class="wrap"><a href="../index.html">Home</a><span>/</span><a href="../index.html#products">Products</a><span>/</span><a href="../index.html?area=${p.area}#products">${esc(a.label)}</a><span>/</span><b>${esc(p.brand)}</b></div></div>
+  <div class="crumbs"><div class="wrap"><a href="../index.html">Home</a><span>/</span><a href="../products/">Products</a><span>/</span><a href="../products/#${p.area}">${esc(a.label)}</a><span>/</span><b>${esc(p.brand)}</b></div></div>
 
   <section class="phero"><div class="wrap">
     <a class="pvis" href="../images/products/${p.slug}.jpg" target="_blank" rel="noopener" aria-label="Open full-size ${esc(p.brand)} brochure page">
@@ -302,7 +302,7 @@ ${header("")}
           <li>Supplying distributors, stockists, pharmacies, hospitals and clinics</li>
           <li>Registered office in Ahmedabad, Gujarat; GST-registered in Jharkhand</li>
         </ul>
-        <a class="btn blue" href="index.html#products">View our products</a>
+        <a class="btn blue" href="products/">View our products</a>
       </div>
     </div>
   </section>
@@ -327,7 +327,7 @@ ${header("")}
         <h2>Registration <span>&amp; compliance</span></h2>
         <p>Keiross Lifescience is a private limited company registered with the Ministry of Corporate Affairs, Government of India.</p>
         <h3 class="ta">Therapy areas</h3>
-        <div class="chips">${areas.map(k => `<a class="chip" style="--area:${AREAS[k].hex}" href="index.html?area=${k}#products">${esc(AREAS[k].label)}</a>`).join("")}</div>
+        <div class="chips">${areas.map(k => `<a class="chip" style="--area:${AREAS[k].hex}" href="products/#${k}">${esc(AREAS[k].label)}</a>`).join("")}</div>
       </div>
       <div class="ftable">
         <table>
@@ -362,14 +362,119 @@ ${footer("")}
 }
 fs.writeFileSync(path.join(ROOT, "about.html"), aboutPage());
 
+/* ---------------- products/index.html (catalogue hub) ---------------- */
+function productsHub(){
+  const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
+  const url = `${BASE}/products/`;
+  const variantCount = PRODUCTS.reduce((n, p) => n + p.variants.length, 0);
+  const desc = `Keiross Lifescience product catalogue: ${PRODUCTS.length} brands and ${variantCount} variants across ${areas.length} therapy areas — ${areas.map(k => AREAS[k].label).join(", ")}.`;
+  const ld = {
+    "@context":"https://schema.org",
+    "@graph":[
+      { "@type":"CollectionPage", "name":"Keiross Lifescience Products", "url": url, "description": desc,
+        "mainEntity": { "@type":"ItemList", "numberOfItems": PRODUCTS.length,
+          "itemListElement": areas.flatMap(k => PRODUCTS.filter(p => p.area===k)).map((p, i) => ({ "@type":"ListItem", "position": i+1, "name": p.brand, "url": `${BASE}/products/${p.slug}.html` })) } },
+      { "@type":"BreadcrumbList", "itemListElement":[
+        { "@type":"ListItem","position":1,"name":"Home","item":`${BASE}/` },
+        { "@type":"ListItem","position":2,"name":"Products","item":url } ] }
+    ]
+  };
+  const section = k => {
+    const list = PRODUCTS.filter(p => p.area===k);
+    return `
+    <section class="area" id="${k}" style="--area:${AREAS[k].hex}">
+      <div class="ahead">
+        <h2>${esc(AREAS[k].label)} <span>${list.length} brand${list.length>1?"s":""}</span></h2>
+        <p>${esc(AREAS[k].intro || "")}</p>
+      </div>
+      <div class="pgrid">${list.map(card).join("")}</div>
+    </section>`;
+  };
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Products | ${PRODUCTS.length} Brands across ${areas.length} Therapy Areas | Keiross Lifescience</title>
+<meta name="description" content="${esc(desc)}">
+<link rel="canonical" href="${url}">
+<meta property="og:title" content="Keiross Lifescience Products">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${BASE}/images/products/cover.jpg">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="../images/brand/favicon.png">
+<link rel="apple-touch-icon" href="../images/brand/logo-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<script type="application/ld+json">${JSON.stringify(ld)}</script>
+</head>
+<body>
+${header()}
+<main>
+  <section class="pagehero">
+    <div class="wrap">
+      <div class="crumb"><a href="../index.html">Home</a><span>/</span>Products</div>
+      <h1>Our <span>Products</span></h1>
+      <p>${PRODUCTS.length} own brands and ${variantCount} variants across ${areas.length} therapy areas — tablets, capsules, syrups, suspensions and injections for distributors, pharmacies, hospitals and clinics.</p>
+    </div>
+  </section>
+
+  <div class="hubbar"><div class="wrap">
+    <nav class="jump" aria-label="Therapy areas">${areas.map(k => `<a href="#${k}" style="--area:${AREAS[k].hex}">${esc(AREAS[k].label)} <b>${PRODUCTS.filter(p=>p.area===k).length}</b></a>`).join("")}</nav>
+    <input id="hq" type="search" placeholder="Search brand, molecule or condition" aria-label="Search products">
+  </div></div>
+
+  <div class="wrap hub">
+    ${areas.map(section).join("")}
+    <div class="empty" id="hempty" hidden>No products match your search. <a href="../index.html#contact" style="color:var(--teal);font-weight:600">Ask us directly →</a></div>
+    <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
+  </div>
+
+  <section class="cta-band">
+    <div class="wrap">
+      <h2>Need a product or a price list?</h2>
+      <p>Send us your requirement and our team will share availability, pack sizes and trade terms.</p>
+      <a class="btn" href="../index.html#contact">Send an Enquiry</a>
+    </div>
+  </section>
+</main>
+${footer()}
+<script src="../data/site.js"></script>
+<script src="../data/products.js"></script>
+<script src="../assets/common.js"></script>
+<script>
+/* Client-side search over the static list; the HTML itself stays fully crawlable. */
+const text = {};
+PRODUCTS.forEach(p => text[p.slug] = [p.brand, p.composition, p.indications.join(" "), p.variants.map(v => v.brand + " " + v.composition).join(" ")].join(" ").toLowerCase());
+$("#hq").addEventListener("input", e => {
+  const q = e.target.value.trim().toLowerCase(); let any = false;
+  document.querySelectorAll(".area").forEach(sec => {
+    let n = 0;
+    sec.querySelectorAll(".pc").forEach(c => { const slug = c.querySelector("h3 a").getAttribute("href").replace(".html",""); const ok = !q || text[slug].includes(q); c.hidden = !ok; n += ok; });
+    sec.hidden = !n; any = any || n > 0;
+  });
+  $("#hempty").hidden = any;
+});
+</script>
+</body>
+</html>
+`;
+}
+fs.writeFileSync(path.join(ROOT, "products", "index.html"), productsHub());
+
 const today = new Date().toISOString().slice(0,10);
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
 `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${BASE}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
+  <url><loc>${BASE}/products/</loc><lastmod>${today}</lastmod><priority>0.9</priority></url>
   <url><loc>${BASE}/about.html</loc><lastmod>${today}</lastmod><priority>0.7</priority></url>
 ${PRODUCTS.map(p => `  <url><loc>${BASE}/products/${p.slug}.html</loc><lastmod>${today}</lastmod><priority>0.8</priority></url>`).join("\n")}
 </urlset>
 `);
 fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`);
-console.log(`Built ${PRODUCTS.length} product pages + about.html + sitemap.xml`);
+console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about.html + sitemap.xml`);

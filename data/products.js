@@ -20,15 +20,24 @@
      table       optional composition table { title, head[], rows[][] }
    ============================================================ */
 window.AREAS = {
-  anti:    { label: "Anti-infectives",        hex: "#e0572b" },
-  resp:    { label: "Respiratory & Allergy",  hex: "#1f8fd6" },
-  gastro:  { label: "Gastroenterology",       hex: "#d99a0b" },
-  pain:    { label: "Pain & Inflammation",    hex: "#e2336b" },
-  steroid: { label: "Corticosteroids",        hex: "#7b5cd6" },
-  bone:    { label: "Bone, Joint & Gout",     hex: "#0e9aa7" },
-  neuro:   { label: "Neurology",              hex: "#5a67d8" },
-  nutra:   { label: "Nutrition & Wellness",   hex: "#1f9d55" },
-  uro:     { label: "Urology",                hex: "#b7791f" }
+  anti:    { label: "Anti-infectives",        hex: "#e0572b",
+             intro: "Antibiotics for respiratory, urinary, enteric, skin and hospital-acquired infections, including cephalosporin combinations effective against ESBL-producing and resistant organisms." },
+  resp:    { label: "Respiratory & Allergy",  hex: "#1f8fd6",
+             intro: "Anti-allergic, bronchodilator, mucolytic and cough formulations for asthma, allergic rhinitis, bronchitis and dry or productive cough, including paediatric suspensions." },
+  gastro:  { label: "Gastroenterology",       hex: "#d99a0b",
+             intro: "Acid-control and digestive-enzyme formulations for GERD, peptic ulcers, dyspepsia, flatulence, bloating and loss of appetite." },
+  pain:    { label: "Pain & Inflammation",    hex: "#e2336b",
+             intro: "Analgesic, anti-inflammatory and antipyretic combinations for musculoskeletal pain, arthritis and post-operative inflammation, and for fever and pain in children." },
+  steroid: { label: "Corticosteroids",        hex: "#7b5cd6",
+             intro: "Oral corticosteroids for asthma, arthritis, dermatological, allergic and other inflammatory or immune-mediated conditions." },
+  bone:    { label: "Bone, Joint & Gout",     hex: "#0e9aa7",
+             intro: "Calcium, vitamin D3 and urate-lowering therapy for osteoporosis, osteomalacia, fractures, bone and muscle pain, and gout." },
+  neuro:   { label: "Neurology",              hex: "#5a67d8",
+             intro: "Nerve-support formulations with methylcobalamin, PEA and nucleotides for diabetic, alcoholic and other peripheral neuropathies." },
+  nutra:   { label: "Nutrition & Wellness",   hex: "#1f9d55",
+             intro: "Iron, multivitamin, multimineral, amino-acid and antioxidant supplements for anaemia, pregnancy, convalescence and general debility." },
+  uro:     { label: "Urology",                hex: "#b7791f",
+             intro: "Ayurvedic urinary alkaliser and diuretic for kidney stones, cystitis and burning micturition." }
 };
 
 window.PRODUCTS = [
