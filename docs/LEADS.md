@@ -1,8 +1,8 @@
 # Where website enquiries go
 
 Every enquiry form on the site (the **Contact** page and the **home page**) posts to
-`/api/lead`, a serverless function in this repo — `functions/api/lead.js` on Cloudflare Pages
-(`api/lead.js` is the equivalent for Vercel). Each new lead
+`/api/lead`, a serverless function in this repo — `functions/api/lead.js`, run by the Cloudflare Worker
+(`api/lead.js` is the old Vercel copy). Each new lead
 reaches you three ways within seconds:
 
 | Channel | What you get | Setup |
@@ -76,6 +76,6 @@ other channels.
 
 ## Test it
 
-Submit the form on `/contact.html` with your own details. Within seconds you should get the email,
-the WhatsApp message and a new sheet row. If something doesn't arrive, check Vercel →
-Deployments → latest → **Logs** for `lead delivery failed` messages.
+Submit the form on `/contact` with your own details. Within seconds you should get the email,
+the WhatsApp message and a new sheet row. If something doesn't arrive, check Cloudflare →
+Workers & Pages → keiross → **Observability** for `lead delivery failed` messages.
