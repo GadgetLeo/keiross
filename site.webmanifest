@@ -1,0 +1,20 @@
+{
+  "name": "Keiross Lifescience",
+  "short_name": "Keiross",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#0b4f8a",
+  "icons": [
+    {
+      "src": "/images/brand/logo-mark.png",
+      "sizes": "194x194",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/brand/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ]
+}

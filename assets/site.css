@@ -483,3 +483,12 @@ form.enq{position:relative}
 .quick .wrap{grid-template-columns:1fr 1fr 1.35fr}
 .qc.em b{font-size:14px}
 @media (max-width:760px){.quick .wrap{grid-template-columns:1fr}}
+
+/* ---------- 404 ---------- */
+.nf{text-align:center;padding:40px 0}
+.nf b{display:block;font:700 clamp(80px,14vw,140px)/1 var(--head);background:linear-gradient(135deg,#e91e7a,#f7941d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nf h1{font-size:clamp(26px,3vw,34px);margin:10px 0 12px}
+.nf p{color:var(--muted);max-width:480px;margin:0 auto 26px}
+.nf .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cc > div{min-width:0}
+.cc p,footer p{overflow-wrap:anywhere}

@@ -11,5 +11,12 @@ window.SITE = {
   hours: "",
   gstin: "20AAMCK6150E1ZV",
   dlno: "",   // Drug licence number(s)
-  url: "https://keiross.vercel.app"
+  url: "https://keiross.vercel.app",   // change when the custom domain is live, then run: node tools/build.js
+
+  // Search engine verification codes (only the content="..." value)
+  googleVerification: "",   // Google Search Console → HTML tag method
+  bingVerification: "",     // Bing Webmaster Tools → HTML meta tag method
+
+  // Official social / directory profiles (full URLs), e.g. LinkedIn, IndiaMART, Facebook
+  sameAs: []
 };

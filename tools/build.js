@@ -27,6 +27,106 @@ const I = {
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-10"/></svg>'
 };
 
+/* ---------------- SEO: shared <head> + schema.org graph ----------------
+   Every page gets one JSON-LD @graph that links to the same Organization
+   and WebSite entities by @id, plus a WebPage node and breadcrumbs. */
+const ORG_ID = `${BASE}/#organization`, WEBSITE_ID = `${BASE}/#website`;
+const ADDRESS = { "@type":"PostalAddress", "streetAddress":"304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol", "addressLocality":"Daskroi, Ahmedabad", "addressRegion":"Gujarat", "postalCode":"382405", "addressCountry":"IN" };
+const SPECIALTY = { anti:"Infectious", resp:"Pulmonary", gastro:"Gastroenterologic", pain:"Rheumatologic", bone:"Rheumatologic", neuro:"Neurologic", nutra:"DietNutrition", uro:"Urologic" };
+
+/* width/height of a local JPEG or PNG (for og:image and ImageObject) */
+function imgSize(rel){
+  const d = fs.readFileSync(path.join(ROOT, rel));
+  if (d.readUInt32BE(0) === 0x89504e47) return [d.readUInt32BE(16), d.readUInt32BE(20)];
+  for (let i = 2; i < d.length;){
+    if (d[i] !== 0xff){ i++; continue; }
+    const m = d[i+1];
+    if (m >= 0xc0 && m <= 0xc2) return [d.readUInt16BE(i+7), d.readUInt16BE(i+5)];
+    i += 2 + d.readUInt16BE(i+2);
+  }
+  return [0, 0];
+}
+const imageObj = rel => { const [w, h] = imgSize(rel); return { "@type":"ImageObject", "url": `${BASE}/${rel}`, "width": w, "height": h }; };
+const clip = (s, n) => s.length <= n ? s : s.slice(0, s.lastIndexOf(" ", n - 1)).replace(/[,.;:—-]+$/, "") + "…";
+/* "Cefixime 200 mg + Ofloxacin 200 mg" -> "Cefixime + Ofloxacin" (max 3 molecules) */
+const shortGeneric = p => {
+  const parts = p.composition.split(/\s*\+\s*/).map(x => x.replace(/\s*\(.*?\)/g, "").replace(/\s+[\d.,]+\s*(mg|mcg|g|iu|IU|ml)\b.*$/i, "").replace(/\s+per\s+.*$/i, "").trim()).filter(Boolean);
+  return parts.length > 3 ? parts.slice(0, 2).join(" + ") + " + more" : parts.join(" + ");
+};
+
+function orgNode(){
+  return {
+    "@type": "Corporation", "@id": ORG_ID,
+    "name": "Keiross Lifescience", "legalName": "Keiross Lifescience Private Limited", "alternateName": ["Keiross", "Keiross Lifescience Pvt. Ltd."],
+    "url": `${BASE}/`, "logo": imageObj("images/brand/logo-mark.png"), "image": imageObj("images/products/cover.jpg"),
+    "slogan": "Caring for Healthy Life",
+    "description": "Ahmedabad-based pharmaceutical company marketing own-brand prescription medicines, pharmaceutical formulations and nutraceuticals to distributors, stockists, pharmacies, hospitals and clinics across India.",
+    "foundingDate": "2026-02-18", "foundingLocation": { "@type":"Place", "name":"Ahmedabad, Gujarat, India" },
+    "identifier": { "@type":"PropertyValue", "propertyID":"CIN", "value":"U46497GJ2026PTC173763" },
+    "taxID": SITE.gstin || undefined, "email": SITE.email || undefined, "telephone": SITE.phone || undefined,
+    "address": ADDRESS,
+    "contactPoint": [{ "@type":"ContactPoint", "contactType":"sales", "telephone": SITE.phone || undefined, "email": SITE.email || undefined, "areaServed":"IN", "availableLanguage":["English","Hindi","Gujarati"], "url": `${BASE}/contact.html` }],
+    "areaServed": { "@type":"Country", "name":"India" },
+    "knowsAbout": Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => AREAS[k].label),
+    "numberOfEmployees": undefined,
+    "member": TEAM.map(m => ({ "@type":"OrganizationRole", "roleName": m.role, "member": { "@type":"Person", "@id": `${BASE}/about.html#${m.name.toLowerCase().replace(/[^a-z]+/g, "-")}`, "name": m.name, "jobTitle": m.role } })),
+    "sameAs": (SITE.sameAs || []).length ? SITE.sameAs : undefined
+  };
+}
+function websiteNode(){
+  return { "@type":"WebSite", "@id": WEBSITE_ID, "url": `${BASE}/`, "name":"Keiross Lifescience", "alternateName":"Keiross", "publisher": { "@id": ORG_ID }, "inLanguage":"en-IN" };
+}
+
+/* opts: r (root prefix), path (e.g. "products/keifix-o.html"), title, desc, type (WebPage subtype),
+         image (site-relative path), ogType, crumbs [[name, path], ...], main (node or @id), extra (nodes), noindex */
+function pageHead(o){
+  const r = o.r == null ? "../" : o.r;
+  const url = `${BASE}/${o.path || ""}`;
+  const img = imageObj(o.image || "images/products/cover.jpg");
+  const desc = clip(o.desc, 158);
+  const graph = [orgNode(), websiteNode()];
+  const page = {
+    "@type": o.type || "WebPage", "@id": `${url}#webpage`, "url": url, "name": o.title, "description": desc,
+    "isPartOf": { "@id": WEBSITE_ID }, "inLanguage":"en-IN", "primaryImageOfPage": img,
+    "about": { "@id": ORG_ID }
+  };
+  if (o.crumbs){
+    page.breadcrumb = { "@id": `${url}#breadcrumb` };
+    graph.push({ "@type":"BreadcrumbList", "@id": `${url}#breadcrumb`, "itemListElement": o.crumbs.map(([name, p], i) => ({ "@type":"ListItem", "position": i+1, "name": name, "item": `${BASE}/${p}` })) });
+  }
+  if (o.main){ page.mainEntity = typeof o.main === "string" ? { "@id": o.main } : { "@id": o.main["@id"] }; if (typeof o.main !== "string") graph.push(o.main); }
+  graph.push(page, ...(o.extra || []));
+  const ld = JSON.stringify({ "@context":"https://schema.org", "@graph": graph }).replace(/</g, "\\u003c");
+  return `<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${esc(o.title)}</title>
+<meta name="description" content="${esc(desc)}">
+<meta name="robots" content="${o.noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1"}">
+${o.noindex ? "" : `<link rel="canonical" href="${url}">\n`}${SITE.googleVerification ? `<meta name="google-site-verification" content="${esc(SITE.googleVerification)}">\n` : ""}${SITE.bingVerification ? `<meta name="msvalidate.01" content="${esc(SITE.bingVerification)}">\n` : ""}<meta property="og:site_name" content="Keiross Lifescience">
+<meta property="og:locale" content="en_IN">
+<meta property="og:type" content="${o.ogType || "website"}">
+<meta property="og:title" content="${esc(o.ogTitle || o.title)}">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${img.url}">
+<meta property="og:image:width" content="${img.width}">
+<meta property="og:image:height" content="${img.height}">
+<meta property="og:image:alt" content="${esc(o.imageAlt || o.title)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(o.ogTitle || o.title)}">
+<meta name="twitter:description" content="${esc(desc)}">
+<meta name="twitter:image" content="${img.url}">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="${r}images/brand/favicon.png">
+<link rel="apple-touch-icon" href="${r}images/brand/logo-mark.png">
+<link rel="manifest" href="${r}site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${r}assets/site.css">
+<script type="application/ld+json">${ld}</script>`;
+}
+
 /* r = path from the page to the site root: "../" for products/, "" for root pages */
 const rel = (html, r) => r === "../" ? html : html.replaceAll('href="../', `href="${r}`).replaceAll('src="../', `src="${r}`);
 
@@ -88,24 +188,22 @@ function card(p){
 function page(p){
   const a = AREAS[p.area];
   const url = `${BASE}/products/${p.slug}.html`;
-  const desc = `${p.brand} ${formLabel(p)} — ${p.composition}. ${p.indications.slice(0,4).join(", ")}. Marketed by Keiross Lifescience.`;
+  const desc = `${p.brand} ${formLabel(p)} (${p.composition}) by Keiross Lifescience for ${p.indications.slice(0,4).join(", ").toLowerCase()}.`;
   const related = PRODUCTS.filter(x => x.area===p.area && x.slug!==p.slug).concat(PRODUCTS.filter(x => x.area!==p.area)).slice(0,4);
-  const ld = {
-    "@context":"https://schema.org",
-    "@graph":[
-      Object.assign({
-        "@type": p.type==="nutra" ? "DietarySupplement" : "Drug",
-        "name": p.brand, "url": url, "image": `${BASE}/images/products/${p.slug}.jpg`,
-        "description": desc, "activeIngredient": p.composition,
-        "manufacturer": { "@type":"Organization", "name":"Keiross Lifescience Private Limited", "url": BASE || undefined }
-      }, p.type==="rx" ? { "dosageForm": p.form, "prescriptionStatus":"https://schema.org/PrescriptionOnly" } : {}),
-      { "@type":"BreadcrumbList", "itemListElement":[
-        { "@type":"ListItem","position":1,"name":"Home","item":`${BASE}/` },
-        { "@type":"ListItem","position":2,"name":"Products","item":`${BASE}/products/` },
-        { "@type":"ListItem","position":3,"name":p.brand,"item":url }
-      ]}
-    ]
+  const route = { Tablet:"Oral", Capsule:"Oral", Softgel:"Oral", Syrup:"Oral", Suspension:"Oral" }[p.form];
+  const product = {
+    "@type": p.type==="nutra" ? "DietarySupplement" : "Drug", "@id": `${url}#product`,
+    "name": p.brand, "proprietaryName": p.brand, "nonProprietaryName": shortGeneric(p), "isProprietary": true,
+    "url": url, "image": imageObj(`images/products/${p.slug}.jpg`), "description": desc,
+    "activeIngredient": p.composition, "dosageForm": formLabel(p), "administrationRoute": route,
+    "prescriptionStatus": p.type==="rx" ? "https://schema.org/PrescriptionOnly" : "https://schema.org/OTC",
+    "relevantSpecialty": SPECIALTY[p.area] ? `https://schema.org/${SPECIALTY[p.area]}` : undefined,
+    "mainEntityOfPage": { "@id": `${url}#webpage` }
   };
+  const extra = p.variants.map((v, i) => ({ "@type":"Drug", "@id": `${url}#variant-${i+1}`, "name": v.brand, "proprietaryName": v.brand,
+    "isProprietary": true, "activeIngredient": v.composition, "dosageForm": v.form, "subjectOf": { "@id": `${url}#webpage` } }));
+  const t1 = `${p.brand} ${formLabel(p)} (${shortGeneric(p)}) | Keiross`;
+  const title = t1.length <= 65 ? t1 : `${p.brand} ${formLabel(p)} | Keiross Lifescience`;
   const benefits = p.benefits.map(b => `
         <div class="bcard">${b.title?`<h3>${esc(b.title)}</h3>`:""}${b.points.length?`<ul class="ticks sm">${b.points.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}</div>`).join("");
   const table = p.table ? `
@@ -122,24 +220,9 @@ function page(p){
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>${esc(p.brand)} ${esc(formLabel(p))} | ${esc(p.composition)} | Keiross Lifescience</title>
-<meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${url}">
-<meta property="og:title" content="${esc(p.brand)} ${esc(formLabel(p))} — Keiross Lifescience">
-<meta property="og:description" content="${esc(desc)}">
-<meta property="og:type" content="product">
-<meta property="og:url" content="${url}">
-<meta property="og:image" content="${BASE}/images/products/${p.slug}.jpg">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" type="image/png" href="../images/brand/favicon.png">
-<link rel="apple-touch-icon" href="../images/brand/logo-mark.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/site.css">
-<script type="application/ld+json">${JSON.stringify(ld)}</script>
+${pageHead({ r:"../", path:`products/${p.slug}.html`, title, ogTitle:`${p.brand} ${formLabel(p)} — Keiross Lifescience`, desc, type:"ItemPage", ogType:"product",
+  image:`images/products/${p.slug}.jpg`, imageAlt:`${p.brand} — ${p.composition}`,
+  crumbs:[["Home",""],["Products","products/"],[a.label,`products/#${p.area}`],[p.brand,`products/${p.slug}.html`]], main:product, extra })}
 </head>
 <body class="ppage" style="--area:${a.hex}">
 ${header()}
@@ -233,47 +316,13 @@ function aboutPage(){
           ${m.bio && m.bio.length ? m.bio.map(t => `<p>${esc(t)}</p>`).join("") : `<p class="soon">Profile coming soon.</p>`}
         </div>
       </article>`;
-  const ld = {
-    "@context":"https://schema.org",
-    "@type":"AboutPage",
-    "url": `${BASE}/about.html`,
-    "name": "About Keiross Lifescience",
-    "mainEntity": {
-      "@type":"Organization",
-      "name":"Keiross Lifescience",
-      "legalName":"Keiross Lifescience Private Limited",
-      "url": BASE + "/",
-      "logo": `${BASE}/images/brand/logo-mark.png`,
-      "foundingDate":"2026-02-18",
-      "taxID": SITE.gstin || undefined,
-      "email": SITE.email || undefined,
-      "telephone": SITE.phone || undefined,
-      "identifier": { "@type":"PropertyValue", "propertyID":"CIN", "value":"U46497GJ2026PTC173763" },
-      "address": { "@type":"PostalAddress", "streetAddress":"304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol", "addressLocality":"Daskroi, Ahmedabad", "addressRegion":"Gujarat", "postalCode":"382405", "addressCountry":"IN" },
-      "member": TEAM.map(m => ({ "@type":"OrganizationRole", "roleName": m.role, "member": { "@type":"Person", "name": m.name, "jobTitle": m.role } }))
-    }
-  };
   const fact = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>About Us | Keiross Lifescience Pvt. Ltd.</title>
-<meta name="description" content="Keiross Lifescience Private Limited is an Ahmedabad-based pharmaceutical company marketing ${PRODUCTS.length} own-brand medicines and nutraceuticals across ${areas.length} therapy areas. Meet our directors and see our company details.">
-<link rel="canonical" href="${BASE}/about.html">
-<meta property="og:title" content="About Keiross Lifescience">
-<meta property="og:type" content="website">
-<meta property="og:url" content="${BASE}/about.html">
-<meta property="og:image" content="${BASE}/images/products/cover.jpg">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" type="image/png" href="images/brand/favicon.png">
-<link rel="apple-touch-icon" href="images/brand/logo-mark.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
-<script type="application/ld+json">${JSON.stringify(ld)}</script>
+${pageHead({ r:"", path:"about.html", title:"About Us | Keiross Lifescience Pvt. Ltd.", ogTitle:"About Keiross Lifescience",
+  desc:`Keiross Lifescience Private Limited is an Ahmedabad-based pharmaceutical company marketing ${PRODUCTS.length} own-brand medicines across ${areas.length} therapy areas. Meet our directors.`,
+  type:"AboutPage", crumbs:[["Home",""],["About Us","about.html"]], main:ORG_ID })}
 </head>
 <body>
 ${header("")}
@@ -368,17 +417,6 @@ function productsHub(){
   const url = `${BASE}/products/`;
   const variantCount = PRODUCTS.reduce((n, p) => n + p.variants.length, 0);
   const desc = `Keiross Lifescience product catalogue: ${PRODUCTS.length} brands and ${variantCount} variants across ${areas.length} therapy areas — ${areas.map(k => AREAS[k].label).join(", ")}.`;
-  const ld = {
-    "@context":"https://schema.org",
-    "@graph":[
-      { "@type":"CollectionPage", "name":"Keiross Lifescience Products", "url": url, "description": desc,
-        "mainEntity": { "@type":"ItemList", "numberOfItems": PRODUCTS.length,
-          "itemListElement": areas.flatMap(k => PRODUCTS.filter(p => p.area===k)).map((p, i) => ({ "@type":"ListItem", "position": i+1, "name": p.brand, "url": `${BASE}/products/${p.slug}.html` })) } },
-      { "@type":"BreadcrumbList", "itemListElement":[
-        { "@type":"ListItem","position":1,"name":"Home","item":`${BASE}/` },
-        { "@type":"ListItem","position":2,"name":"Products","item":url } ] }
-    ]
-  };
   const section = k => {
     const list = PRODUCTS.filter(p => p.area===k);
     return `
@@ -393,24 +431,10 @@ function productsHub(){
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Products | ${PRODUCTS.length} Brands across ${areas.length} Therapy Areas | Keiross Lifescience</title>
-<meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${url}">
-<meta property="og:title" content="Keiross Lifescience Products">
-<meta property="og:description" content="${esc(desc)}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="${url}">
-<meta property="og:image" content="${BASE}/images/products/cover.jpg">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" type="image/png" href="../images/brand/favicon.png">
-<link rel="apple-touch-icon" href="../images/brand/logo-mark.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/site.css">
-<script type="application/ld+json">${JSON.stringify(ld)}</script>
+${pageHead({ r:"../", path:"products/", title:`Products | ${PRODUCTS.length} Brands, ${areas.length} Therapy Areas | Keiross Lifescience`, ogTitle:"Keiross Lifescience Products",
+  desc, type:"CollectionPage", crumbs:[["Home",""],["Products","products/"]],
+  main:{ "@type":"ItemList", "@id":`${url}#itemlist`, "name":"Keiross Lifescience products", "numberOfItems":PRODUCTS.length,
+    "itemListElement": areas.flatMap(k => PRODUCTS.filter(p => p.area===k)).map((p, i) => ({ "@type":"ListItem", "position":i+1, "name":p.brand, "url":`${BASE}/products/${p.slug}.html` })) } })}
 </head>
 <body>
 ${header()}
@@ -478,38 +502,12 @@ function contactPage(){
     mail: I.mail.replace('stroke-width="2"', 'stroke-width="1.8"'),
     pin: I.pin.replace('stroke-width="2"', 'stroke-width="1.8"'),
   };
-  const ld = {
-    "@context":"https://schema.org",
-    "@type":"ContactPage",
-    "url": `${BASE}/contact.html`,
-    "name": "Contact Keiross Lifescience",
-    "mainEntity": {
-      "@type":"Organization", "name":"Keiross Lifescience Private Limited", "url": BASE + "/",
-      "email": SITE.email || undefined, "telephone": SITE.phone || undefined,
-      "address": { "@type":"PostalAddress", "streetAddress":"304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol", "addressLocality":"Daskroi, Ahmedabad", "addressRegion":"Gujarat", "postalCode":"382405", "addressCountry":"IN" },
-      "contactPoint": [{ "@type":"ContactPoint", "contactType":"sales", "telephone": SITE.phone || undefined, "email": SITE.email || undefined, "areaServed":"IN", "availableLanguage":["English","Hindi","Gujarati"] }]
-    }
-  };
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Contact Us | Distributor & Trade Enquiries | Keiross Lifescience</title>
-<meta name="description" content="Contact Keiross Lifescience for distributorship, stockist, pharmacy and hospital enquiries, product availability and trade terms. Call or WhatsApp ${esc(SITE.phone || "")} or send an enquiry online.">
-<link rel="canonical" href="${BASE}/contact.html">
-<meta property="og:title" content="Contact Keiross Lifescience">
-<meta property="og:type" content="website">
-<meta property="og:url" content="${BASE}/contact.html">
-<meta property="og:image" content="${BASE}/images/products/cover.jpg">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" type="image/png" href="images/brand/favicon.png">
-<link rel="apple-touch-icon" href="images/brand/logo-mark.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
-<script type="application/ld+json">${JSON.stringify(ld)}</script>
+${pageHead({ r:"", path:"contact.html", title:"Contact Us | Trade Enquiries | Keiross Lifescience", ogTitle:"Contact Keiross Lifescience",
+  desc:`Contact Keiross Lifescience for distributorship, stockist, pharmacy and hospital enquiries, price lists and trade terms. Call or WhatsApp ${SITE.phone || ""}.`,
+  type:"ContactPage", crumbs:[["Home",""],["Contact Us","contact.html"]], main:ORG_ID })}
 </head>
 <body>
 ${header("")}
@@ -588,16 +586,62 @@ ${footer("")}
 }
 fs.writeFileSync(path.join(ROOT, "contact.html"), contactPage());
 
+/* ---------------- index.html <head> (between SEO markers) ---------------- */
+{
+  const f = path.join(ROOT, "index.html");
+  const html = fs.readFileSync(f, "utf8");
+  const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
+  const head = pageHead({ r:"", path:"", title:"Keiross Lifescience Pvt. Ltd. | Pharmaceutical Company, Ahmedabad",
+    ogTitle:"Keiross Lifescience — Caring for Healthy Life",
+    desc:`Keiross Lifescience markets ${PRODUCTS.length} own-brand medicines and nutraceuticals across ${areas.length} therapy areas to distributors, stockists, pharmacies, hospitals and clinics across India.`,
+    image:"images/products/cover.jpg", imageAlt:"Keiross Lifescience — Caring for Healthy Life", main:ORG_ID });
+  fs.writeFileSync(f, html.replace(/<!-- SEO:START[^>]*-->[\s\S]*?<!-- SEO:END -->/, m => m.slice(0, m.indexOf("-->") + 3) + "\n" + head + "\n<!-- SEO:END -->"));
+}
+
+/* ---------------- 404.html ---------------- */
+fs.writeFileSync(path.join(ROOT, "404.html"), `<!DOCTYPE html>
+<html lang="en">
+<head>
+${pageHead({ r:"/", path:"404.html", title:"Page not found | Keiross Lifescience", desc:"The page you were looking for could not be found. Browse our products or contact Keiross Lifescience.", noindex:true })}
+</head>
+<body>
+${header("/")}
+<main>
+  <section class="sec"><div class="wrap nf">
+    <b>404</b>
+    <h1>Page not found</h1>
+    <p>The page you're looking for may have moved. Try our product catalogue or get in touch.</p>
+    <div class="acts"><a class="btn" href="/products/">Browse products</a><a class="btn line-dark" href="/contact.html">Contact us</a><a class="btn line-dark" href="/">Home</a></div>
+  </div></section>
+</main>
+${footer("/")}
+<script src="/data/site.js"></script>
+<script src="/assets/common.js"></script>
+</body>
+</html>
+`);
+
+/* ---------------- site.webmanifest ---------------- */
+fs.writeFileSync(path.join(ROOT, "site.webmanifest"), JSON.stringify({
+  name: "Keiross Lifescience", short_name: "Keiross", start_url: "/", display: "browser",
+  background_color: "#ffffff", theme_color: "#0b4f8a",
+  icons: [{ src: "/images/brand/logo-mark.png", sizes: "194x194", type: "image/png" }, { src: "/images/brand/favicon.png", sizes: "64x64", type: "image/png" }]
+}, null, 2) + "\n");
+
 const today = new Date().toISOString().slice(0,10);
+const smImg = (rel, title) => `<image:image><image:loc>${BASE}/${rel}</image:loc><image:title>${esc(title)}</image:title></image:image>`;
+const smUrl = (p, pri, imgs = "") => `  <url><loc>${BASE}/${p}</loc><lastmod>${today}</lastmod><priority>${pri}</priority>${imgs}</url>`;
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"),
 `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${BASE}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
-  <url><loc>${BASE}/products/</loc><lastmod>${today}</lastmod><priority>0.9</priority></url>
-  <url><loc>${BASE}/contact.html</loc><lastmod>${today}</lastmod><priority>0.7</priority></url>
-  <url><loc>${BASE}/about.html</loc><lastmod>${today}</lastmod><priority>0.7</priority></url>
-${PRODUCTS.map(p => `  <url><loc>${BASE}/products/${p.slug}.html</loc><lastmod>${today}</lastmod><priority>0.8</priority></url>`).join("\n")}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${[
+  smUrl("", "1.0", smImg("images/products/cover.jpg", "Keiross Lifescience")),
+  smUrl("products/", "0.9"),
+  ...PRODUCTS.map(p => smUrl(`products/${p.slug}.html`, "0.8", smImg(`images/products/${p.slug}.jpg`, `${p.brand} ${formLabel(p)} — ${p.composition}`))),
+  smUrl("about.html", "0.6"),
+  smUrl("contact.html", "0.7")
+].join("\n")}
 </urlset>
 `);
-fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`);
-console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about.html + contact.html + sitemap.xml`);
+fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${BASE}/sitemap.xml\n`);
+console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about.html + contact.html + index <head> + 404 + sitemap.xml`);
