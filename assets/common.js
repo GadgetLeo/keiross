@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (menu && burger){
     burger.addEventListener("click", () => { const o = menu.classList.toggle("open"); burger.setAttribute("aria-expanded", o); });
     menu.addEventListener("click", e => {
-      // mobile: chevron buttons expand the products menu / a therapy area
+      // mobile: the chevron next to "Products" expands the category list
       const t = e.target.closest(".ddt,.subt");
       if (t){ const box = t.parentElement, o = box.classList.toggle("open"); t.setAttribute("aria-expanded", o); return; }
       if (e.target.closest("a")) { menu.classList.remove("open"); burger.setAttribute("aria-expanded", false); }

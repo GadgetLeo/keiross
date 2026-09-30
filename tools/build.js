@@ -147,7 +147,7 @@ function header(r = "../"){
         ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<div class="mcol"><a class="mh" href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a><button class="subt" type="button" aria-label="Show ${esc(AREAS[k].label)} products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
           <ul>${PRODUCTS.filter(p => p.area===k).map(p => `<li><a href="../products/${p.slug}.html">${esc(p.brand)}</a></li>`).join("")}</ul></div>`).join("\n        ")}
       </div>
-      <div class="mfoot"><a href="../products/">View all products</a><span>${PRODUCTS.length} brands across ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).length} therapy areas</span></div></div>
+      <div class="mfoot"><a href="../products/">View all products</a><span>${PRODUCTS.length} brands across ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).length} categories</span></div></div>
     </div>
     <a href="../contact.html?type=Distributor">Distributors</a>
     <a href="../contact.html">Contact Us</a>
@@ -164,7 +164,7 @@ function footer(r = "../"){
       <a class="logo" href="/" style="margin-bottom:18px">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
-    <div><h4>Therapy Areas</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
+    <div><h4>Categories</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
     <div><h4>Company</h4><ul><li><a href="../about.html">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact.html?type=Distributor">Distributors</a></li><li><a href="../contact.html">Contact Us</a></li></ul></div>
     <div><h4>Registered Office</h4>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
@@ -268,7 +268,7 @@ ${header()}
         <table>
           <tr><td>Brand</td><td>${esc(p.brand)}</td></tr>
           <tr><td>Dosage form</td><td>${esc(formLabel(p))}</td></tr>
-          <tr><td>Therapy area</td><td>${esc(a.label)}</td></tr>
+          <tr><td>Category</td><td>${esc(a.label)}</td></tr>
           <tr><td>Category</td><td>${esc(TYPE[p.type])}</td></tr>
           <tr><td>Pack size</td><td>On enquiry</td></tr>
           <tr><td>Marketed by</td><td>Keiross Lifescience Pvt. Ltd., Ahmedabad</td></tr>
@@ -324,7 +324,7 @@ function aboutPage(){
 <html lang="en">
 <head>
 ${pageHead({ r:"", path:"about.html", title:"About Us | Keiross Lifescience Pvt. Ltd.", ogTitle:"About Keiross Lifescience",
-  desc:`Keiross Lifescience Private Limited is an Ahmedabad-based pharmaceutical company marketing ${PRODUCTS.length} own-brand medicines across ${areas.length} therapy areas. Meet our directors.`,
+  desc:`Keiross Lifescience Private Limited is an Ahmedabad-based pharmaceutical company marketing ${PRODUCTS.length} own-brand medicines across ${areas.length} categories. Meet our directors.`,
   type:"AboutPage", crumbs:[["Home",""],["About Us","about.html"]], main:ORG_ID })}
 </head>
 <body>
@@ -348,7 +348,7 @@ ${header("")}
         <span class="kick">Who we are</span>
         <h2>Keiross Lifescience <span>Pvt. Ltd.</span></h2>
         <p>Keiross Lifescience Private Limited is a pharmaceutical healthcare company engaged in marketing quality pharmaceutical formulations and healthcare products under its own brand names.</p>
-        <p>Our portfolio of ${PRODUCTS.length} brands spans ${areas.length} therapy areas — from anti-infectives and respiratory care to neurology, bone health and nutrition — in tablets, capsules, syrups, suspensions and injections. Every product is manufactured through approved, qualified pharmaceutical manufacturing partners.</p>
+        <p>Our portfolio of ${PRODUCTS.length} brands spans ${areas.length} categories — from anti-infectives and respiratory care to neurology, bone health and nutrition — in tablets, capsules, syrups, suspensions and injections. Every product is manufactured through approved, qualified pharmaceutical manufacturing partners.</p>
         <ul class="ticks">
           <li>${PRODUCTS.length} own brands, plus paediatric and strength variants</li>
           <li>Supplying distributors, stockists, pharmacies, hospitals and clinics</li>
@@ -378,7 +378,7 @@ ${header("")}
         <span class="kick">Company details</span>
         <h2>Registration <span>&amp; compliance</span></h2>
         <p>Keiross Lifescience is a private limited company registered with the Ministry of Corporate Affairs, Government of India.</p>
-        <h3 class="ta">Therapy areas</h3>
+        <h3 class="ta">Product categories</h3>
         <div class="chips">${areas.map(k => `<a class="chip" style="--area:${AREAS[k].hex}" href="products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a>`).join("")}</div>
       </div>
       <div class="ftable">
@@ -419,7 +419,7 @@ function productsHub(){
   const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
   const url = `${BASE}/products/`;
   const variantCount = PRODUCTS.reduce((n, p) => n + p.variants.length, 0);
-  const desc = `Keiross Lifescience products: ${PRODUCTS.length} brands and ${variantCount} variants across ${areas.length} therapy areas — ${areas.map(k => AREAS[k].label).join(", ")}.`;
+  const desc = `Keiross Lifescience products: ${PRODUCTS.length} brands and ${variantCount} variants across ${areas.length} categories — ${areas.map(k => AREAS[k].label).join(", ")}.`;
   const cardFor = k => {
     const A = AREAS[k], list = PRODUCTS.filter(p => p.area===k);
     return `
@@ -433,9 +433,9 @@ function productsHub(){
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-${pageHead({ r:"../", path:"products/", title:`Products | ${PRODUCTS.length} Brands, ${areas.length} Therapy Areas | Keiross Lifescience`, ogTitle:"Keiross Lifescience Products",
+${pageHead({ r:"../", path:"products/", title:`Products | ${PRODUCTS.length} Brands, ${areas.length} Categories | Keiross Lifescience`, ogTitle:"Keiross Lifescience Products",
   desc, type:"CollectionPage", crumbs:[["Home",""],["Products","products/"]],
-  main:{ "@type":"ItemList", "@id":`${url}#therapy-areas`, "name":"Keiross Lifescience therapy areas", "numberOfItems":areas.length,
+  main:{ "@type":"ItemList", "@id":`${url}#categories`, "name":"Keiross Lifescience product categories", "numberOfItems":areas.length,
     "itemListElement": areas.map((k, i) => ({ "@type":"ListItem", "position":i+1, "name":AREAS[k].label, "url":`${BASE}/products/${AREAS[k].slug}/` })) } })}
 </head>
 <body>
@@ -445,7 +445,7 @@ ${header()}
     <div class="wrap">
       <div class="crumb"><a href="/">Home</a><span>/</span>Products</div>
       <h1>Our <span>Products</span></h1>
-      <p>${PRODUCTS.length} own brands and ${variantCount} variants across ${areas.length} therapy areas — tablets, capsules, syrups, suspensions and injections for distributors, pharmacies, hospitals and clinics.</p>
+      <p>${PRODUCTS.length} own brands and ${variantCount} variants across ${areas.length} categories — tablets, capsules, syrups, suspensions and injections for distributors, pharmacies, hospitals and clinics.</p>
     </div>
   </section>
   <section class="sec">
@@ -602,7 +602,7 @@ ${header("../../")}
       <div class="pgrid">${rel2(list.map(card).join(""))}</div>
     </section>
     <section class="area">
-      <div class="ahead" style="--area:var(--teal)"><h2>Other therapy areas</h2></div>
+      <div class="ahead" style="--area:var(--teal)"><h2>Other categories</h2></div>
       <div class="chips others">${others.map(x => `<a class="chip" style="--area:${AREAS[x].hex}" href="../${AREAS[x].slug}/">${esc(AREAS[x].label)}</a>`).join("")}<a class="chip" href="../">All products</a></div>
     </section>
     <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
@@ -660,7 +660,7 @@ const TILE_ICONS = {
           </div>
         </article>`).join("")}
       </div>
-      <div class="showall"><a class="btn blue" href="products/">View all ${PRODUCTS.length} products →</a><span>${areas.length} therapy areas · tablets, capsules, syrups, suspensions &amp; injections</span></div>`;
+      <div class="showall"><a class="btn blue" href="products/">View all ${PRODUCTS.length} products →</a><span>${areas.length} categories · tablets, capsules, syrups, suspensions &amp; injections</span></div>`;
   fill("HEADER", header(""));
   fill("TILES", tiles);
   fill("FEATURED", featured);
@@ -675,7 +675,7 @@ const TILE_ICONS = {
   const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
   const head = pageHead({ r:"", path:"", title:"Keiross Lifescience Pvt. Ltd. | Pharmaceutical Company, Ahmedabad",
     ogTitle:"Keiross Lifescience — Caring for Healthy Life",
-    desc:`Keiross Lifescience markets ${PRODUCTS.length} own-brand medicines and nutraceuticals across ${areas.length} therapy areas to distributors, stockists, pharmacies, hospitals and clinics across India.`,
+    desc:`Keiross Lifescience markets ${PRODUCTS.length} own-brand medicines and nutraceuticals across ${areas.length} categories to distributors, stockists, pharmacies, hospitals and clinics across India.`,
     image:"images/products/cover.jpg", imageAlt:"Keiross Lifescience — Caring for Healthy Life", main:ORG_ID });
   fs.writeFileSync(f, html.replace(/<!-- SEO:START[^>]*-->[\s\S]*?<!-- SEO:END -->/, m => m.slice(0, m.indexOf("-->") + 3) + "\n" + head + "\n<!-- SEO:END -->"));
 }

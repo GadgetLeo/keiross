@@ -537,3 +537,10 @@ a.tile{display:block}
 .catcard .more:hover{text-decoration:underline;text-underline-offset:3px}
 .chips.others .chip{font-weight:500}
 @media (max-width:960px){.hdr .wrap{position:static}}
+/* phone menu: Products -> categories only (each links to its page) */
+@media (max-width:960px){
+  .mcol .subt,.mcol ul{display:none!important}
+  .mh{padding:11px 0 11px 14px!important}
+  .mfoot{padding:6px 14px 14px}
+  .mfoot a{font-weight:600!important}
+}
