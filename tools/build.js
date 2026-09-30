@@ -165,7 +165,7 @@ function footer(r = "../"){
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
     <div><h4>Categories</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
-    <div><h4>Company</h4><ul><li><a href="../about">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact?type=Distributor">Distributors</a></li><li><a href="../contact">Contact Us</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="../about">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact?type=Distributor">Distributors</a></li><li><a href="../contact">Contact Us</a></li><li><a href="../privacy">Privacy Policy</a></li></ul></div>
     <div><h4>Registered Office</h4>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
       <p><span data-cfg="phone"></span></p><p><span data-cfg="email"></span></p>
@@ -174,7 +174,7 @@ function footer(r = "../"){
   </div>
   <div class="fbot"><div class="wrap">
     <span>© <span id="yr">2026</span> Keiross Lifescience Pvt. Ltd. All rights reserved.</span>
-    <span>Product information is intended for registered medical practitioners and the pharmaceutical trade.</span>
+    <span>Product information is intended for registered medical practitioners and the pharmaceutical trade. <a href="../privacy">Privacy Policy</a></span>
   </div></div>
 </footer>`, r);
 }
@@ -311,12 +311,11 @@ function aboutPage(){
   const initials = n => { const w = n.split(/\s+/).filter(Boolean); return (w[0][0] + (w.length > 1 ? w[w.length-1][0] : "")).toUpperCase(); };
   const person = m => `
       <article class="person">
-        <div class="ph">${m.photo ? `<img src="${esc(m.photo)}" alt="${esc(m.name)}" width="600" height="600" loading="lazy">` : `<span aria-hidden="true">${esc(initials(m.name))}</span>`}</div>
+        <div class="ph"><span aria-hidden="true">${esc(initials(m.name))}</span></div>
         <div class="pb">
           <h3>${esc(m.name)}</h3>
           <div class="role">${esc(m.role)}</div>
           ${m.din ? `<div class="din">DIN: ${esc(m.din)}</div>` : ""}
-          ${m.bio && m.bio.length ? m.bio.map(t => `<p>${esc(t)}</p>`).join("") : `<p class="soon">Profile coming soon.</p>`}
         </div>
       </article>`;
   const fact = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
@@ -387,7 +386,6 @@ ${header("")}
           ${fact("CIN", "U46497GJ2026PTC173763")}
           ${fact("Incorporated", "18 February 2026")}
           ${fact("GSTIN", `<span data-cfg="gstin"></span>`)}
-          ${fact("Drug licence no.", `<span data-cfg="dlno"></span>`)}
           ${fact("Registered office", "304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat")}
           ${fact("Phone / WhatsApp", `<span data-cfg="phone"></span>`)}
           ${fact("Email", `<span data-cfg="email"></span>`)}
@@ -530,7 +528,7 @@ ${header("")}
           <label class="fl full">Message<textarea name="msg" maxlength="2000" placeholder="Your requirement, delivery location, or any questions"></textarea></label>
           <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
           <input type="hidden" name="t">
-          <label class="consent full"><input type="checkbox" name="consent"> <span>I agree to be contacted by Keiross Lifescience by phone, WhatsApp or email about this enquiry. *</span></label>
+          <label class="consent full"><input type="checkbox" name="consent"> <span>I agree to be contacted by Keiross Lifescience by phone, WhatsApp or email about this enquiry, as described in the <a href="privacy">Privacy Policy</a>. *</span></label>
           <div class="factions">
             <button class="btn" type="submit">Send Enquiry</button>
             <span data-status role="status" aria-live="polite"></span>
@@ -550,7 +548,7 @@ ${header("")}
         <div class="office">
           <h3>Registered office</h3>
           <p>${esc(addr)}</p>
-          <p class="hrs"><b>Business hours:</b> <span data-cfg="hours"></span></p>
+          <p class="hrs" data-optional><b>Business hours:</b> <span data-cfg="hours"></span></p>
           <div class="map"><iframe title="Keiross Lifescience office location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=${mapQ}&z=15&output=embed"></iframe></div>
           <a class="ml" href="https://www.google.com/maps/search/?api=1&query=${mapQ}" target="_blank" rel="noopener">Open in Google Maps →</a>
         </div>
@@ -567,6 +565,100 @@ ${footer("")}
 `;
 }
 fs.writeFileSync(path.join(ROOT, "contact.html"), contactPage());
+
+/* ---------------- privacy.html ---------------- */
+function privacyPage(){
+  const updated = "30 September 2026";
+  const S = [
+    ["who", "Who we are", `
+      <p>This website is operated by <b>Keiross Lifescience Private Limited</b> (CIN U46497GJ2026PTC173763), registered office: 304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India (“Keiross”, “we”, “us”).</p>
+      <p>This policy explains what personal data we collect through this website, why we collect it, who we share it with and the choices you have. It is written to meet the Digital Personal Data Protection Act, 2023 and the Information Technology Act, 2000 and its rules. For this data, Keiross is the <i>Data Fiduciary</i>.</p>`],
+    ["collect", "Information we collect", `
+      <p><b>Information you give us.</b> When you send an enquiry through a form on this website we collect:</p>
+      <ul>
+        <li>your name, and your firm or organisation name;</li>
+        <li>phone / WhatsApp number and email address;</li>
+        <li>the type of buyer you are (for example distributor, pharmacy or hospital) and your city / state;</li>
+        <li>the products you are interested in and any message you write.</li>
+      </ul>
+      <p><b>Information collected automatically with an enquiry.</b> The page you sent it from, the date and time, and your approximate location (city, region and country) worked out from your internet (IP) address. We do not collect your precise location.</p>
+      <p><b>Technical logs.</b> Like any website, our hosting provider keeps short-lived technical logs (such as IP address, browser type and the pages requested) to run the site securely and stop abuse.</p>
+      <p><b>Cookies and analytics.</b> We do not currently use advertising cookies, tracking cookies or analytics tools. If that changes, we will update this policy first.</p>
+      <p><b>Health information.</b> This website is for business enquiries only. Please do <b>not</b> send us patient details, prescriptions or other health information through it.</p>`],
+    ["use", "How we use your information", `
+      <ul>
+        <li>to reply to your enquiry by phone, WhatsApp or email;</li>
+        <li>to share product availability, pack sizes, price lists and trade terms you asked about;</li>
+        <li>to set up and manage a business relationship with you, such as a distributorship or supply arrangement;</li>
+        <li>to keep records required by law, and to protect the website against spam and misuse.</li>
+      </ul>
+      <p>We process this data on the basis of the consent you give when you tick the box on the enquiry form, and where the law otherwise permits it. We will not use it to send you unrelated promotional messages, and we do not sell or rent your data to anyone.</p>`],
+    ["share", "Who we share it with", `
+      <p>Only with service providers who handle it on our behalf, under their own security and confidentiality terms:</p>
+      <ul>
+        <li><b>Cloudflare</b>: hosts this website and processes the enquiry form;</li>
+        <li><b>Google</b>: our enquiry records are kept in Google Sheets and we receive enquiry alerts by Gmail;</li>
+        <li><b>WhatsApp notification service</b>: may send our team a short alert about a new enquiry.</li>
+      </ul>
+      <p>Our Contact page shows an embedded Google Map, and the site loads fonts from Google Fonts; when these load, Google receives your IP address under its own privacy policy. Some of these providers may store data on servers outside India.</p>
+      <p>We may also disclose information where required by law, court order or a government authority, or to protect our legal rights.</p>`],
+    ["keep", "How long we keep it", `
+      <p>We keep enquiry details for as long as we need them to deal with your enquiry and any business relationship that follows. Enquiries that do not lead to business are deleted within 24 months. Records we must keep by law (for example tax and invoicing records) are kept for the period the law requires.</p>`],
+    ["secure", "How we protect it", `
+      <p>The website uses encrypted connections (HTTPS), enquiry records are accessible only to authorised Keiross staff, and our providers use industry-standard security. No system is completely secure, but we take reasonable steps to protect your data and will act promptly if a breach occurs, including informing you and the authorities where the law requires.</p>`],
+    ["rights", "Your rights", `
+      <p>You can ask us to:</p>
+      <ul>
+        <li>tell you what personal data we hold about you and how it is used;</li>
+        <li>correct, complete or update it;</li>
+        <li>erase it, where we no longer need to keep it by law;</li>
+        <li>stop contacting you. You can withdraw your consent at any time, as easily as you gave it.</li>
+      </ul>
+      <p>You may also nominate another person to exercise these rights on your behalf in case of death or incapacity. Email us at <span data-cfg="email"></span> from the email address or with the phone number you used, so we can confirm it is you. We will reply within 30 days. Withdrawing consent does not affect anything we did lawfully before you withdrew it.</p>`],
+    ["grievance", "Questions and complaints", `
+      <p>For any question or complaint about your personal data, contact our Grievance Officer:</p>
+      <p class="addr"><b>Grievance Officer</b><br>Keiross Lifescience Private Limited<br>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat<br>Email: <span data-cfg="email"></span><br>Phone: <span data-cfg="phone"></span></p>
+      <p>We will acknowledge your complaint within 48 hours and aim to resolve it within 30 days. If you are not satisfied with our response, you may complain to the Data Protection Board of India.</p>`],
+    ["other", "Children, other websites and changes", `
+      <p>This website is meant for businesses and healthcare professionals and is not directed at anyone under 18. We do not knowingly collect data from children.</p>
+      <p>Links to other websites and apps (such as WhatsApp or Google Maps) are covered by those services' own privacy policies.</p>
+      <p>We may update this policy from time to time. The date at the top shows when it last changed.</p>`]
+  ];
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+${pageHead({ r:"", path:"privacy", title:"Privacy Policy | Keiross Lifescience Pvt. Ltd.", ogTitle:"Privacy Policy — Keiross Lifescience",
+  desc:"How Keiross Lifescience collects, uses, shares and protects personal data submitted through its website enquiry forms, and how to exercise your rights.",
+  crumbs:[["Home",""],["Privacy Policy","privacy"]] })}
+</head>
+<body>
+${header("")}
+<main>
+  <section class="pagehero slim">
+    <div class="wrap">
+      <div class="crumb"><a href="/">Home</a><span>/</span>Privacy Policy</div>
+      <h1>Privacy <span>Policy</span></h1>
+      <p>Last updated: ${updated}</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap legal">
+      <nav class="toc" aria-label="On this page"><b>On this page</b><ol>${S.map(([id, h]) => `<li><a href="privacy#${id}">${h}</a></li>`).join("")}</ol></nav>
+      <div class="prose">${S.map(([id, h, body], i) => `
+        <h2 id="${id}">${i + 1}. ${h}</h2>${body}`).join("")}
+      </div>
+    </div>
+  </section>
+</main>
+${footer("")}
+<script src="data/site.js"></script>
+<script src="assets/common.js"></script>
+</body>
+</html>
+`;
+}
+fs.writeFileSync(path.join(ROOT, "privacy.html"), privacyPage());
 
 /* ---------------- products/<area>/index.html (category pages) ---------------- */
 function categoryPage(k){
@@ -722,9 +814,10 @@ ${[
   ...Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => smUrl(`products/${AREAS[k].slug}/`, "0.8")),
   ...PRODUCTS.map(p => smUrl(`products/${p.slug}`, "0.8", smImg(`images/products/${p.slug}.jpg`, `${p.brand} ${formLabel(p)} — ${p.composition}`))),
   smUrl("about", "0.6"),
-  smUrl("contact", "0.7")
+  smUrl("contact", "0.7"),
+  smUrl("privacy", "0.3")
 ].join("\n")}
 </urlset>
 `);
 fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${BASE}/sitemap.xml\n`);
-console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about + contact + index <head> + 404 + sitemap.xml`);
+console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about + contact + privacy + index <head> + 404 + sitemap.xml`);

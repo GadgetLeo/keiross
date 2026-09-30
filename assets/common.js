@@ -1,11 +1,12 @@
 /* Shared helpers for the home page and product pages. Needs data/site.js loaded first. */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const SLOT = { phone:"Phone to be added", whatsapp:"WhatsApp to be added", email:"Email to be added", hours:"Hours to be added", gstin:"To be added", dlno:"To be added" };
+const SLOT = { phone:"Phone to be added", whatsapp:"WhatsApp to be added", email:"Email to be added", hours:"Hours to be added", gstin:"To be added" };
 
 function fillConfig(){
   document.querySelectorAll("[data-cfg]").forEach(el => {
     const k = el.dataset.cfg, v = SITE[k];
+    if (!v && el.closest("[data-optional]")) { el.closest("[data-optional]").hidden = true; return; }
     if (!v) { el.innerHTML = `<span class="slot">${SLOT[k]}</span>`; return; }
     if (k==="phone") el.innerHTML = `<a href="tel:${esc(v.replace(/\s/g,""))}">${esc(v)}</a>`;
     else if (k==="whatsapp") el.innerHTML = `<a href="https://wa.me/${esc(v.replace(/\D/g,""))}" target="_blank" rel="noopener">WhatsApp: +${esc(v.replace(/\D/g,""))}</a>`;
