@@ -142,12 +142,12 @@ function header(r = "../"){
   <nav class="menu" id="menu">
     <a href="/">Home</a>
     <a href="../about.html">About Us</a>
-    <div class="dd"><a href="../products/">Products</a><button class="ddt" type="button" aria-label="Show product categories" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="drop mega">
-        <a class="all" href="../products/">All products <b>${PRODUCTS.length}</b></a>
-        ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => { const list = PRODUCTS.filter(p => p.area===k); return `<div class="sub" style="--area:${AREAS[k].hex}"><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}<span class="n">${list.length}</span></a><button class="subt" type="button" aria-label="Show ${esc(AREAS[k].label)} products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></button>
-          <div class="fly"><div class="fh">${esc(AREAS[k].label)}</div>${list.map(p => `<a href="../products/${p.slug}.html"><b>${esc(p.brand)}</b><small>${esc(formLabel(p))} · ${esc(shortGeneric(p))}</small></a>`).join("")}</div></div>`; }).join("\n        ")}
+    <div class="dd"><a href="../products/">Products</a><button class="ddt" type="button" aria-label="Show products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="drop mega"><div class="mcols">
+        ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<div class="mcol"><a class="mh" href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a><button class="subt" type="button" aria-label="Show ${esc(AREAS[k].label)} products" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+          <ul>${PRODUCTS.filter(p => p.area===k).map(p => `<li><a href="../products/${p.slug}.html">${esc(p.brand)}</a></li>`).join("")}</ul></div>`).join("\n        ")}
       </div>
+      <div class="mfoot"><a href="../products/">View all products</a><span>${PRODUCTS.length} brands across ${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).length} therapy areas</span></div></div>
     </div>
     <a href="../contact.html?type=Distributor">Distributors</a>
     <a href="../contact.html">Contact Us</a>
@@ -419,25 +419,24 @@ function productsHub(){
   const areas = Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k));
   const url = `${BASE}/products/`;
   const variantCount = PRODUCTS.reduce((n, p) => n + p.variants.length, 0);
-  const desc = `Keiross Lifescience product catalogue: ${PRODUCTS.length} brands and ${variantCount} variants across ${areas.length} therapy areas — ${areas.map(k => AREAS[k].label).join(", ")}.`;
-  const section = k => {
-    const list = PRODUCTS.filter(p => p.area===k);
+  const desc = `Keiross Lifescience products: ${PRODUCTS.length} brands and ${variantCount} variants across ${areas.length} therapy areas — ${areas.map(k => AREAS[k].label).join(", ")}.`;
+  const cardFor = k => {
+    const A = AREAS[k], list = PRODUCTS.filter(p => p.area===k);
     return `
-    <section class="area" id="${k}" style="--area:${AREAS[k].hex}">
-      <div class="ahead">
-        <h2>${esc(AREAS[k].label)} <span>${list.length} brand${list.length>1?"s":""}</span></h2>
-        <p>${esc(AREAS[k].intro || "")}</p>
-      </div>
-      <div class="pgrid">${list.map(card).join("")}</div>
-    </section>`;
+      <article class="catcard" style="--area:${A.hex}">
+        <h2><a href="${A.slug}/">${esc(A.label)}</a></h2>
+        <p>${esc(A.short || A.intro || "")}</p>
+        <ul>${list.map(p => `<li><a href="${p.slug}.html">${esc(p.brand)}</a><span>${esc(formLabel(p))} · ${esc(shortGeneric(p))}</span></li>`).join("")}</ul>
+        <a class="more" href="${A.slug}/">View ${esc(A.label)}<span aria-hidden="true"> →</span></a>
+      </article>`;
   };
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 ${pageHead({ r:"../", path:"products/", title:`Products | ${PRODUCTS.length} Brands, ${areas.length} Therapy Areas | Keiross Lifescience`, ogTitle:"Keiross Lifescience Products",
   desc, type:"CollectionPage", crumbs:[["Home",""],["Products","products/"]],
-  main:{ "@type":"ItemList", "@id":`${url}#itemlist`, "name":"Keiross Lifescience products", "numberOfItems":PRODUCTS.length,
-    "itemListElement": areas.flatMap(k => PRODUCTS.filter(p => p.area===k)).map((p, i) => ({ "@type":"ListItem", "position":i+1, "name":p.brand, "url":`${BASE}/products/${p.slug}.html` })) } })}
+  main:{ "@type":"ItemList", "@id":`${url}#therapy-areas`, "name":"Keiross Lifescience therapy areas", "numberOfItems":areas.length,
+    "itemListElement": areas.map((k, i) => ({ "@type":"ListItem", "position":i+1, "name":AREAS[k].label, "url":`${BASE}/products/${AREAS[k].slug}/` })) } })}
 </head>
 <body>
 ${header()}
@@ -449,18 +448,13 @@ ${header()}
       <p>${PRODUCTS.length} own brands and ${variantCount} variants across ${areas.length} therapy areas — tablets, capsules, syrups, suspensions and injections for distributors, pharmacies, hospitals and clinics.</p>
     </div>
   </section>
-
-  <div class="hubbar"><div class="wrap">
-    <nav class="jump" aria-label="Therapy areas">${areas.map(k => `<a href="#${k}" style="--area:${AREAS[k].hex}">${esc(AREAS[k].label)} <b>${PRODUCTS.filter(p=>p.area===k).length}</b></a>`).join("")}</nav>
-    <input id="hq" type="search" placeholder="Search brand, molecule or condition" aria-label="Search products">
-  </div></div>
-
-  <div class="wrap hub">
-    ${areas.map(section).join("")}
-    <div class="empty" id="hempty" hidden>No products match your search. <a href="../contact.html" style="color:var(--teal);font-weight:600">Ask us directly →</a></div>
-    <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
-  </div>
-
+  <section class="sec">
+    <div class="wrap">
+      <div class="catgrid">${areas.map(cardFor).join("")}
+      </div>
+      <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
+    </div>
+  </section>
   <section class="cta-band">
     <div class="wrap">
       <h2>Need a product or a price list?</h2>
@@ -471,22 +465,7 @@ ${header()}
 </main>
 ${footer()}
 <script src="../data/site.js"></script>
-<script src="../data/products.js"></script>
 <script src="../assets/common.js"></script>
-<script>
-/* Client-side search over the static list; the HTML itself stays fully crawlable. */
-const text = {};
-PRODUCTS.forEach(p => text[p.slug] = [p.brand, p.composition, p.indications.join(" "), p.variants.map(v => v.brand + " " + v.composition).join(" ")].join(" ").toLowerCase());
-$("#hq").addEventListener("input", e => {
-  const q = e.target.value.trim().toLowerCase(); let any = false;
-  document.querySelectorAll(".area").forEach(sec => {
-    let n = 0;
-    sec.querySelectorAll(".pc").forEach(c => { const slug = c.querySelector("h3 a").getAttribute("href").replace(".html",""); const ok = !q || text[slug].includes(q); c.hidden = !ok; n += ok; });
-    sec.hidden = !n; any = any || n > 0;
-  });
-  $("#hempty").hidden = any;
-});
-</script>
 </body>
 </html>
 `;
@@ -624,7 +603,7 @@ ${header("../../")}
     </section>
     <section class="area">
       <div class="ahead" style="--area:var(--teal)"><h2>Other therapy areas</h2></div>
-      <div class="chips others">${others.map(x => `<a class="chip" style="--area:${AREAS[x].hex}" href="../${AREAS[x].slug}/">${esc(AREAS[x].label)} <b>${PRODUCTS.filter(p => p.area===x).length}</b></a>`).join("")}<a class="chip" href="../">All products</a></div>
+      <div class="chips others">${others.map(x => `<a class="chip" style="--area:${AREAS[x].hex}" href="../${AREAS[x].slug}/">${esc(AREAS[x].label)}</a>`).join("")}<a class="chip" href="../">All products</a></div>
     </section>
     <p class="pnote">Pack sizes and trade terms are shared on enquiry. Prescription medicines are supplied to licensed trade buyers only.</p>
   </div>
