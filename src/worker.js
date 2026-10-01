@@ -6,11 +6,14 @@ import { onRequestPost, onRequest } from "../functions/api/lead.js";
 export default {
   async fetch(request, env) {
     const url = new URL(request.url), { pathname } = url;
-    /* Once CANONICAL_HOST is set (wrangler.jsonc vars), send the workers.dev address and
-       www. to the real domain with a 301 so search engines index one copy only. */
+    /* CANONICAL_HOST (wrangler.jsonc vars) is the real domain: www. always 301s to it, and
+       the workers.dev address does too once REDIRECT_WORKERS_DEV is "true". Other hosts
+       (preview URLs) are served with noindex so search engines index one copy only. */
     const canon = env.CANONICAL_HOST;
     if (canon && url.hostname !== canon) {
-      if (url.hostname === `www.${canon}` || /^keiross\.[^.]+\.workers\.dev$/.test(url.hostname)) {
+      const toCanon = url.hostname === `www.${canon}` ||
+        (env.REDIRECT_WORKERS_DEV === "true" && /^keiross\.[^.]+\.workers\.dev$/.test(url.hostname));
+      if (toCanon) {
         url.hostname = canon; url.protocol = "https:"; url.port = "";
         return Response.redirect(url.toString(), 301);
       }
