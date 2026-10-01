@@ -42,4 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target.closest("a")) { menu.classList.remove("open"); burger.setAttribute("aria-expanded", false); }
     });
   }
+
+  /* Product image gallery: scroll-snap track with arrows and dots. */
+  document.querySelectorAll("[data-gal]").forEach(g => {
+    const t = g.querySelector(".gtrack"), dots = [...g.querySelectorAll(".gdots button")];
+    const prev = g.querySelector(".gprev"), next = g.querySelector(".gnext"), n = t.children.length;
+    const cur = () => Math.round(t.scrollLeft / t.clientWidth);
+    const go = i => t.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * t.clientWidth });
+    const sync = () => { const i = cur(); dots.forEach((d, j) => j === i ? d.setAttribute("aria-current", "true") : d.removeAttribute("aria-current"));
+      if (prev) { prev.disabled = i === 0; next.disabled = i === n - 1; } };
+    dots.forEach((d, j) => d.addEventListener("click", () => go(j)));
+    if (prev) { prev.addEventListener("click", () => go(cur() - 1)); next.addEventListener("click", () => go(cur() + 1)); }
+    t.addEventListener("keydown", e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); go(cur() + (e.key === "ArrowRight" ? 1 : -1)); } });
+    t.addEventListener("scroll", () => requestAnimationFrame(sync), { passive: true });
+    sync();
+  });
 });

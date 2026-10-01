@@ -47,6 +47,15 @@ function imgSize(rel){
   return [0, 0];
 }
 const imageObj = rel => { const [w, h] = imgSize(rel); return { "@type":"ImageObject", "url": `${BASE}/${rel}`, "width": w, "height": h }; };
+/* Product images: refined pack shot (images/products/hd/) first, then the original
+   photo (images/products/photo/), then the brochure page. Missing files are skipped. */
+const has = rel => fs.existsSync(path.join(ROOT, rel));
+const mainImg = p => has(`images/products/hd/${p.slug}.jpg`) ? `images/products/hd/${p.slug}.jpg` : `images/products/${p.slug}.jpg`;
+const slides = p => [
+  has(`images/products/hd/${p.slug}.jpg`) && { src:`images/products/hd/${p.slug}.jpg`, small:`images/products/hd/${p.slug}-600.jpg`, alt:`${p.brand} — ${p.composition}`, cap:"Pack shot" },
+  has(`images/products/photo/${p.slug}.jpg`) && { src:`images/products/photo/${p.slug}.jpg`, alt:`${p.brand} — original product photo`, cap:"Original photo" },
+  { src:`images/products/${p.slug}.jpg`, alt:`${p.brand} brochure page`, cap:"Brochure page" }
+].filter(Boolean);
 const clip = (s, n) => s.length <= n ? s : s.slice(0, s.lastIndexOf(" ", n - 1)).replace(/[,.;:—-]+$/, "") + "…";
 /* "Cefixime 200 mg + Ofloxacin 200 mg" -> "Cefixime + Ofloxacin" (max 3 molecules) */
 const shortGeneric = p => {
@@ -199,7 +208,7 @@ function page(p){
   const product = {
     "@type": p.type==="nutra" ? "DietarySupplement" : "Drug", "@id": `${url}#product`,
     "name": p.brand, "proprietaryName": p.brand, "nonProprietaryName": shortGeneric(p), "isProprietary": true,
-    "url": url, "image": imageObj(`images/products/${p.slug}.jpg`), "description": desc,
+    "url": url, "image": slides(p).map(x => imageObj(x.src)), "description": desc,
     "activeIngredient": p.composition, "dosageForm": formLabel(p), "administrationRoute": route,
     "prescriptionStatus": p.type==="rx" ? "https://schema.org/PrescriptionOnly" : "https://schema.org/OTC",
     "relevantSpecialty": SPECIALTY[p.area] ? `https://schema.org/${SPECIALTY[p.area]}` : undefined,
@@ -226,7 +235,7 @@ function page(p){
 <html lang="en">
 <head>
 ${pageHead({ r:"../", path:`products/${p.slug}`, title, ogTitle:`${p.brand} ${formLabel(p)} — Keiross Lifescience`, desc, type:"ItemPage", ogType:"product",
-  image:`images/products/${p.slug}.jpg`, imageAlt:`${p.brand} — ${p.composition}`,
+  image:mainImg(p), imageAlt:`${p.brand} — ${p.composition}`,
   crumbs:[["Home",""],["Products","products/"],[a.label,`products/${AREAS[p.area].slug}/`],[p.brand,`products/${p.slug}`]], main:product, extra })}
 </head>
 <body class="ppage" style="--area:${a.hex}">
@@ -235,10 +244,13 @@ ${header()}
   <div class="crumbs"><div class="wrap"><a href="/">Home</a><span>/</span><a href="../products/">Products</a><span>/</span><a href="../products/${AREAS[p.area].slug}/">${esc(a.label)}</a><span>/</span><b>${esc(p.brand)}</b></div></div>
 
   <section class="phero"><div class="wrap">
-    <a class="pvis" href="../images/products/${p.slug}.jpg" target="_blank" rel="noopener" aria-label="Open full-size ${esc(p.brand)} brochure page">
-      <img src="../images/products/${p.slug}.jpg" alt="${esc(p.brand)} — ${esc(p.composition)}" width="1400" height="906">
-      <span class="zoom">Tap to enlarge</span>
-    </a>
+    <div class="pvis" data-gal>
+      <div class="gtrack" tabindex="0" role="region" aria-label="${esc(p.brand)} images — swipe or use arrow keys">
+${slides(p).map((x, i) => { const [w, h] = imgSize(x.src); return `        <a class="gs" href="../${x.src}" target="_blank" rel="noopener"><img src="../${x.small || x.src}"${x.small ? ` srcset="../${x.small} 600w, ../${x.src} 1200w" sizes="(max-width:900px) 100vw, 560px"` : ""} alt="${esc(x.alt)}" width="${w}" height="${h}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}><span class="gcap">${x.cap} · ${i+1}/${slides(p).length}</span></a>`; }).join("\n")}
+      </div>
+${slides(p).length > 1 ? `      <button class="gnav gprev" type="button" aria-label="Previous image">‹</button><button class="gnav gnext" type="button" aria-label="Next image">›</button>
+      <div class="gdots">${slides(p).map((_, i) => `<button type="button" aria-label="Show image ${i+1}"${i ? "" : ' aria-current="true"'}></button>`).join("")}</div>
+` : ""}    </div>
     <div class="pinfo">
       <div class="chips"><span class="chip area">${esc(a.label)}</span><span class="chip">${esc(formLabel(p))}</span>${p.type==="rx"?'<span class="chip rx">℞ Prescription</span>':p.type==="ayurvedic"?'<span class="chip">Ayurvedic</span>':""}</div>
       <h1>${esc(p.brand)}</h1>
@@ -674,7 +686,7 @@ function categoryPage(k){
 <html lang="en">
 <head>
 ${pageHead({ r:"../../", path:`products/${A.slug}/`, title:`${A.label} Brands | ${list.length} Product${list.length>1?"s":""} | Keiross Lifescience`, ogTitle:`${A.label} — Keiross Lifescience`,
-  desc, type:"CollectionPage", image:`images/products/${list[0].slug}.jpg`,
+  desc, type:"CollectionPage", image:mainImg(list[0]),
   crumbs:[["Home",""],["Products","products/"],[A.label,`products/${A.slug}/`]],
   main:{ "@type":"ItemList", "@id":`${url}#itemlist`, "name":`${A.label} — Keiross Lifescience`, "numberOfItems":list.length,
     "itemListElement": list.map((p, i) => ({ "@type":"ListItem", "position":i+1, "name":p.brand, "url":`${BASE}/products/${p.slug}` })) } })}
@@ -814,7 +826,7 @@ ${[
   smUrl("", "1.0", smImg("images/products/cover.jpg", "Keiross Lifescience")),
   smUrl("products/", "0.9"),
   ...Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => smUrl(`products/${AREAS[k].slug}/`, "0.8")),
-  ...PRODUCTS.map(p => smUrl(`products/${p.slug}`, "0.8", smImg(`images/products/${p.slug}.jpg`, `${p.brand} ${formLabel(p)} — ${p.composition}`))),
+  ...PRODUCTS.map(p => smUrl(`products/${p.slug}`, "0.8", smImg(mainImg(p), `${p.brand} ${formLabel(p)} — ${p.composition}`))),
   smUrl("about", "0.6"),
   smUrl("contact", "0.7"),
   smUrl("privacy", "0.3")
