@@ -834,4 +834,15 @@ ${[
 </urlset>
 `);
 fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${BASE}/sitemap.xml\n`);
+/* Cache-busting: stamp every page's assets/*.css|js URL with a short content hash so a
+   changed file is fetched fresh instead of served stale from the browser cache. */
+const crypto = require("crypto");
+const VER = {};
+for (const f of ["site.css", "common.js", "lead.js"]) VER[f] = crypto.createHash("sha1").update(fs.readFileSync(path.join(ROOT, "assets", f))).digest("hex").slice(0, 8);
+const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name.startsWith(".") || e.name === "node_modules" ? [] : e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".html") ? [path.join(d, e.name)] : []);
+for (const f of walk(ROOT)) {
+  const html = fs.readFileSync(f, "utf8");
+  const out = html.replace(/(assets\/(site\.css|common\.js|lead\.js))(\?v=[0-9a-f]+)?"/g, (m, url, name) => `${url}?v=${VER[name]}"`);
+  if (out !== html) fs.writeFileSync(f, out);
+}
 console.log(`Built ${PRODUCTS.length} product pages + products/index.html + about + contact + privacy + index <head> + 404 + sitemap.xml`);
