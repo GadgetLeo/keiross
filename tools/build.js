@@ -244,12 +244,15 @@ ${header()}
   <div class="crumbs"><div class="wrap"><a href="/">Home</a><span>/</span><a href="../products/">Products</a><span>/</span><a href="../products/${AREAS[p.area].slug}/">${esc(a.label)}</a><span>/</span><b>${esc(p.brand)}</b></div></div>
 
   <section class="phero"><div class="wrap">
-    <div class="pvis" data-gal>
-      <div class="gtrack" tabindex="0" role="region" aria-label="${esc(p.brand)} images — swipe or use arrow keys">
-${slides(p).map((x, i) => { const [w, h] = imgSize(x.src); return `        <a class="gs" href="../${x.src}" target="_blank" rel="noopener"><img src="../${x.small || x.src}"${x.small ? ` srcset="../${x.small} 600w, ../${x.src} 1200w" sizes="(max-width:900px) 100vw, 560px"` : ""} alt="${esc(x.alt)}" width="${w}" height="${h}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}><span class="gcap">${x.cap} · ${i+1}/${slides(p).length}</span></a>`; }).join("\n")}
+    <div class="pslider" data-slider>
+      <div class="pview"><div class="pstrip">
+${slides(p).map((x, i) => { const [w, h] = imgSize(x.src); return `        <a class="ps" href="../${x.src}" target="_blank" rel="noopener"${i ? ' aria-hidden="true" tabindex="-1"' : ""}><img src="../${x.small || x.src}"${x.small ? ` srcset="../${x.small} 600w, ../${x.src} 1200w" sizes="(max-width:900px) 100vw, 560px"` : ""} alt="${esc(x.alt)}" width="${w}" height="${h}"${i ? ' loading="lazy"' : ' fetchpriority="high"'}></a>`; }).join("\n")}
+      </div></div>
+${slides(p).length > 1 ? `      <div class="pctrl">
+        <button class="parr" type="button" data-step="-1" aria-label="Previous image">‹</button>
+        <div class="pnums">${slides(p).map((x, i) => `<button type="button" aria-label="Image ${i+1}: ${x.cap}"${i ? "" : ' aria-current="true"'}>${i+1}</button>`).join("")}</div>
+        <button class="parr" type="button" data-step="1" aria-label="Next image">›</button>
       </div>
-${slides(p).length > 1 ? `      <button class="gnav gprev" type="button" aria-label="Previous image">‹</button><button class="gnav gnext" type="button" aria-label="Next image">›</button>
-      <div class="gdots">${slides(p).map((_, i) => `<button type="button" aria-label="Show image ${i+1}"${i ? "" : ' aria-current="true"'}></button>`).join("")}</div>
 ` : ""}    </div>
     <div class="pinfo">
       <div class="chips"><span class="chip area">${esc(a.label)}</span><span class="chip">${esc(formLabel(p))}</span>${p.type==="rx"?'<span class="chip rx">℞ Prescription</span>':p.type==="ayurvedic"?'<span class="chip">Ayurvedic</span>':""}</div>

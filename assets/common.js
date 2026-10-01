@@ -43,18 +43,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* Product image gallery: scroll-snap track with arrows and dots. */
-  document.querySelectorAll("[data-gal]").forEach(g => {
-    const t = g.querySelector(".gtrack"), dots = [...g.querySelectorAll(".gdots button")];
-    const prev = g.querySelector(".gprev"), next = g.querySelector(".gnext"), n = t.children.length;
-    const cur = () => Math.round(t.scrollLeft / t.clientWidth);
-    const go = i => t.scrollTo({ left: Math.max(0, Math.min(n - 1, i)) * t.clientWidth });
-    const sync = () => { const i = cur(); dots.forEach((d, j) => j === i ? d.setAttribute("aria-current", "true") : d.removeAttribute("aria-current"));
-      if (prev) { prev.disabled = i === 0; next.disabled = i === n - 1; } };
-    dots.forEach((d, j) => d.addEventListener("click", () => go(j)));
-    if (prev) { prev.addEventListener("click", () => go(cur() - 1)); next.addEventListener("click", () => go(cur() + 1)); }
-    t.addEventListener("keydown", e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); go(cur() + (e.key === "ArrowRight" ? 1 : -1)); } });
-    t.addEventListener("scroll", () => requestAnimationFrame(sync), { passive: true });
-    sync();
+  /* Product image slider: one image at a time, moved by the number buttons, arrows or a swipe. */
+  document.querySelectorAll("[data-slider]").forEach(g => {
+    const strip = g.querySelector(".pstrip"), slides = [...strip.children], nums = [...g.querySelectorAll(".pnums button")];
+    const arrows = [...g.querySelectorAll(".parr")];
+    if (!nums.length) return;
+    let cur = 0;
+    const show = i => {
+      cur = Math.max(0, Math.min(slides.length - 1, i));
+      strip.style.transform = `translateX(${-100 * cur}%)`;
+      slides.forEach((s, j) => { s.toggleAttribute("aria-hidden", j !== cur); s.tabIndex = j === cur ? 0 : -1; });
+      nums.forEach((b, j) => j === cur ? b.setAttribute("aria-current", "true") : b.removeAttribute("aria-current"));
+      arrows[0].disabled = cur === 0; arrows[1].disabled = cur === slides.length - 1;
+    };
+    nums.forEach((b, j) => b.addEventListener("click", () => show(j)));
+    arrows.forEach(b => b.addEventListener("click", () => show(cur + +b.dataset.step)));
+    let x0 = null;
+    strip.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+    strip.addEventListener("touchend", e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); });
+    show(0);
   });
 });
