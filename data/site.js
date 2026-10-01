@@ -10,7 +10,7 @@ window.SITE = {
   email: "keirosslifesciencepvtltd@gmail.com",
   hours: "",
   gstin: "20AAMCK6150E1ZV",
-  url: "https://keiross.vercel.app",   // change when the custom domain is live, then run: node tools/build.js
+  url: "https://keirosslifescience.com",   // canonical domain; after changing, run: node tools/build.js
 
   // Search engine verification codes (only the content="..." value)
   googleVerification: "",   // Google Search Console → HTML tag method

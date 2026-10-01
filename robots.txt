@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://keiross.vercel.app/sitemap.xml
+Sitemap: https://keirosslifescience.com/sitemap.xml
