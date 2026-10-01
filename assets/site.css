@@ -224,8 +224,8 @@ form.enq p.sub{grid-column:1/-1;margin:-8px 0 4px;color:var(--muted);font-size:1
 /* footer */
 footer{background:var(--blue-d);color:#b9cadb;font-size:14px}
 .fmain{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.3fr;gap:36px;padding:70px 0 44px}
-footer h4{color:#fff;font-size:17px;margin-bottom:20px;position:relative;padding-bottom:12px}
-footer h4::after{content:"";position:absolute;left:0;bottom:0;width:36px;height:2px;background:var(--teal)}
+footer h3{color:#fff;font-size:17px;margin-bottom:20px;position:relative;padding-bottom:12px}
+footer h3::after{content:"";position:absolute;left:0;bottom:0;width:36px;height:2px;background:var(--teal)}
 footer ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 footer ul a:hover{color:#fff}
 footer .logo b{color:#fff}

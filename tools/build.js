@@ -175,9 +175,9 @@ function footer(r = "../"){
       <a class="logo" href="/" style="margin-bottom:18px">${LOGO}<span><b>KEIROSS</b><small>Lifescience</small></span></a>
       <p>Caring for healthy life. Own-brand prescription medicines, pharmaceutical formulations and nutraceuticals for the trade.</p>
     </div>
-    <div><h4>Categories</h4><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
-    <div><h4>Company</h4><ul><li><a href="../about">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact?type=Distributor">Distributors</a></li><li><a href="../contact">Contact Us</a></li><li><a href="../privacy">Privacy Policy</a></li></ul></div>
-    <div><h4>Registered Office</h4>
+    <div><h3>Categories</h3><ul>${Object.keys(AREAS).filter(k => PRODUCTS.some(p => p.area===k)).map(k => `<li><a href="../products/${AREAS[k].slug}/">${esc(AREAS[k].label)}</a></li>`).join("")}</ul></div>
+    <div><h3>Company</h3><ul><li><a href="../about">About Us</a></li><li><a href="../products/">Products</a></li><li><a href="../contact?type=Distributor">Distributors</a></li><li><a href="../contact">Contact Us</a></li><li><a href="../privacy">Privacy Policy</a></li></ul></div>
+    <div><h3>Registered Office</h3>
       <p>304 Block-H, Merlin Sparsh, Opp. Koyli Talav, B/H Narol, Daskroi, Ahmedabad – 382405, Gujarat, India</p>
       <p><span data-cfg="phone"></span></p><p><span data-cfg="email"></span></p>
       <p>CIN: U46497GJ2026PTC173763<br>GSTIN: <span data-cfg="gstin"></span></p>

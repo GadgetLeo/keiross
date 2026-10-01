@@ -12,6 +12,9 @@
   // Non-secret settings. LEADS_SHEET_SECRET (and optional CALLMEBOT) are set as
   // Secrets in the Cloudflare dashboard: keiross -> Settings -> Variables and Secrets.
   "vars": {
+    // Set to the bare custom domain (e.g. "keirosslifescience.com") once it is attached
+    // to this Worker; leave "" until then. See src/worker.js.
+    "CANONICAL_HOST": "",
     "LEADS_SHEET_WEBHOOK": "https://script.google.com/macros/s/AKfycbwvMHpDfE_1ksy4G_ip5r3QBRxSq_jM0HAhKLX2flqwrQ96Rk42YxVwVUHC-uictB3N9A/exec"
   },
   "assets": {
@@ -19,6 +22,6 @@
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": true
   }
 }
